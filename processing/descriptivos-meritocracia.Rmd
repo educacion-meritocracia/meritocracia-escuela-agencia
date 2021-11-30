@@ -1,0 +1,87 @@
+---
+title: "descriptivos-meritocracia"
+author: "Kevin Carrasco"
+date: "29-11-2021"
+output: html_document
+---
+
+```{r}
+pacman::p_load(haven, dplyr, summarytools, sjmisc, car)
+alumnos <- read_dta("input/data/cuestAlumnos.dta")
+apoderados <- read_dta("input/data/cuestPadres.dta")
+```
+
+```{r}
+data_est <- alumnos %>% dplyr::select(oportunidades=alp38_1,
+                                       esfuerzo=alp38_2,
+                                       merito=alp38_3,
+                                       inteligencia=alp38_4,
+                                       dif_ingresos=alp38_5,
+                                       just_pension=alp39_1,
+                                       just_educ=alp39_2,
+                                       just_salud=alp39_3,
+                                       redistribucion=alp39_4
+                                       ) %>% as.data.frame(.)
+
+data_apod <- apoderados %>% dplyr::select(oportunidades=pap25_1,
+                                       esfuerzo=pap25_2,
+                                       merito=pap25_3,
+                                       inteligencia=pap25_4,
+                                       dif_ingresos=pap25_5,
+                                       just_pension=pap26_1,
+                                       just_educ=pap26_2,
+                                       just_salud=pap26_3,
+                                       redistribucion=pap26_4
+                                       ) %>% as.data.frame(.)
+```
+
+```{r}
+data_est <- data_est %>%  set_na(oportunidades, esfuerzo, merito, inteligencia, dif_ingresos, just_pension, just_educ, just_salud, redistribucion, na = c(0,99), drop.levels = TRUE, as.tag = FALSE) # recode missings de doble marca (99) y vacío (0) a NA
+
+data_apod <- data_apod %>%  set_na(oportunidades, esfuerzo, merito, inteligencia, dif_ingresos, just_pension, just_educ, just_salud, redistribucion, na = c(0,99), drop.levels = TRUE, as.tag = FALSE) # recode missings de doble marca (99) y vacío (0) a NA
+```
+
+
+```{r}
+# estudiantes
+label(data_est$oportunidades) <- "En Chile, las personas tienen igualdad de oportunidades para salir adelante"
+label(data_est$esfuerzo) <- "En Chile, las personas son recompensadas por sus esfuerzos"
+label(data_est$merito) <- "En Chile, las personas obtienen lo que merecen"
+label(data_est$inteligencia) <- "En Chile, las personas son recompensadas por su inteligencia y habilidad"
+label(data_est$dif_ingresos) <- "En Chile, las diferencias de ingreso son demasiado grandes"
+label(data_est$just_pension) <- "Es justo que en Chile las personas con mayores ingresos puedan tener mejores pensiones que las personas de ingresos más bajos"
+label(data_est$just_educ) <- "Es justo que en Chile las personas que puedan pagar tengan una mejor educación para sus hijos"
+label(data_est$just_salud) <- "Es justo que en Chile las personas con mayores ingresos puedan acceder a una mejor atención de salud que las personas con ingresos más bajos"
+label(data_est$redistribucion) <- "El Gobierno de Chile debería hacer algo para reducir las diferencias de ingreso entre ricos y pobres"
+
+# apoderados
+label(data_apod$oportunidades) <- "En Chile, las personas tienen igualdad de oportunidades para salir adelante"
+label(data_apod$esfuerzo) <- "En Chile, las personas son recompensadas por sus esfuerzos"
+label(data_apod$merito) <- "En Chile, las personas obtienen lo que merecen"
+label(data_apod$inteligencia) <- "En Chile, las personas son recompensadas por su inteligencia y habilidad"
+label(data_apod$dif_ingresos) <- "En Chile, las diferencias de ingreso son demasiado grandes"
+label(data_apod$just_pension) <- "Es justo que en Chile las personas con mayores ingresos puedan tener mejores pensiones que las personas de ingresos más bajos"
+label(data_apod$just_educ) <- "Es justo que en Chile las personas que puedan pagar tengan una mejor educación para sus hijos"
+label(data_apod$just_salud) <- "Es justo que en Chile las personas con mayores ingresos puedan acceder a una mejor atención de salud que las personas con ingresos más bajos"
+label(data_apod$redistribucion) <- "El Gobierno de Chile debería hacer algo para reducir las diferencias de ingreso entre ricos y pobres"
+```
+
+# Estudiantes
+```{r}
+print(dfSummary(data_est,
+                varnumbers = F, 
+                graph.col = F, 
+                style = "grid",
+                headings = F),
+      method = "render")
+```
+# Apoderados
+```{r}
+print(dfSummary(data_apod,
+                varnumbers = F, 
+                graph.col = F, 
+                style = "grid",
+                headings = F),
+      method = "render")
+```
+
