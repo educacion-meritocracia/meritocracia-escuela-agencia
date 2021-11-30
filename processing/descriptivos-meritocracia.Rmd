@@ -7,12 +7,21 @@ output: html_document
 
 ```{r}
 pacman::p_load(haven, dplyr, summarytools, sjmisc, car)
-alumnos <- read_dta("input/data/cuestAlumnos.dta")
-apoderados <- read_dta("input/data/cuestPadres.dta")
+alumnos <- read_dta("input/data/original/cuestAlumnos.dta")
+apoderados <- read_dta("input/data/original/cuestPadres.dta")
 ```
 
 ```{r}
-data_est <- alumnos %>% dplyr::select(oportunidades=alp38_1,
+data_est <- alumnos %>% dplyr::select(import_inteligencia=alp6_1,
+                                      import_esfuerzo=alp6_2,
+                                      int_esfuerzo=P7,
+                                      esfuerzo_cambio=alp8,
+                                      esfuerzo_ref=alp9,
+                                      esfuerzo_comp=alp10,
+                                      habilidad_cambio=alp11,
+                                      habilidad_ref=alp12,
+                                      habilidad_comp=alp13,
+                                      oportunidades=alp38_1,
                                        esfuerzo=alp38_2,
                                        merito=alp38_3,
                                        inteligencia=alp38_4,
@@ -36,14 +45,34 @@ data_apod <- apoderados %>% dplyr::select(oportunidades=pap25_1,
 ```
 
 ```{r}
-data_est <- data_est %>%  set_na(oportunidades, esfuerzo, merito, inteligencia, dif_ingresos, just_pension, just_educ, just_salud, redistribucion, na = c(0,99), drop.levels = TRUE, as.tag = FALSE) # recode missings de doble marca (99) y vacío (0) a NA
+data_est <- data_est %>%  set_na(import_inteligencia, import_esfuerzo, int_esfuerzo, esfuerzo_cambio, esfuerzo_ref, esfuerzo_comp, habilidad_cambio, habilidad_ref, habilidad_comp, oportunidades, esfuerzo, merito, inteligencia, dif_ingresos, just_pension, just_educ, just_salud, redistribucion, na = c(0,99), drop.levels = TRUE, as.tag = FALSE) # recode missings de doble marca (99) y vacío (0) a NA
 
 data_apod <- data_apod %>%  set_na(oportunidades, esfuerzo, merito, inteligencia, dif_ingresos, just_pension, just_educ, just_salud, redistribucion, na = c(0,99), drop.levels = TRUE, as.tag = FALSE) # recode missings de doble marca (99) y vacío (0) a NA
 ```
 
+```{r}
+# categorias de respuesta
+data_est$int_esfuerzo=factor(data_est$int_esfuerzo, labels=c("Inteligencia", "Esfuerzo"))
+data_est$esfuerzo_cambio=factor(data_est$esfuerzo_cambio, labels=c("El nivel de esfuerzo puede cambiar", "El nivel de esfuerzo no puede cambiar"))
+data_est$esfuerzo_ref=factor(data_est$esfuerzo_ref, labels=c("Te esfuerzas menos que la mayoria de tus compañeros", "Te esfuerzas igual que la mayoria de tus compañeros", "Te esfuerzas mas que la mayoria de tus compañeros"))
+data_est$esfuerzo_comp=factor(data_est$esfuerzo_comp, labels=c("La mayoria se esfuerza", "Solo unos pocos son esforzados"))
+data_est$habilidad_cambio=factor(data_est$habilidad_cambio, labels=c("El nivel de habilidad puede cambiar", "El nivel de habilidad no puede cambiar"))
+data_est$habilidad_ref=factor(data_est$habilidad_ref, labels=c("Eres menos habil que la mayoria de tus compañeros", "Eres igual de habil que la mayoria de tus compañeros", "Eres mas habil que la mayoria de tus compañeros"))
+data_est$habilidad_comp=factor(data_est$habilidad_comp, labels=c("La mayoria son naturalmente habiles", "Solo unos pocos son naturalmente habiles"))
+```
 
 ```{r}
 # estudiantes
+
+label(data_est$import_inteligencia) <- "La inteligencia es importante para obtener buenas notas"
+label(data_est$import_esfuerzo) <- "El esfuerzo es importante para obtener buenas notas"
+label(data_est$int_esfuerzo) <- "Qué consideras más importante para poder obtener buenos resultados en la escuela"
+label(data_est$esfuerzo_cambio) <- "Algunas personas creen que el nivel de esfuerzo puede cambiar en el tiempo y otros dicen que eso no es posible. Con qué afirmación te identificas más"
+label(data_est$esfuerzo_ref) <- "Tomando en cuenta el esfuerzo que diariamente le dedicas a las diferentes actividades académicas en la escuela, crees que"
+label(data_est$esfuerzo_comp) <- "Pensando en el esfuerzo que la mayoría de tus compañeros le dedica al trabajo académico, crees que"
+label(data_est$habilidad_cambio) <- "Algunas personas creen que la habilidad de una persona es algo que no puede cambiar, otras consideran que sí es posible. Con qué afirmación te identificas más"
+label(data_est$habilidad_ref) <- "Teniendo como referencia las habilidades de tus compañeros de curso, cres que"
+label(data_est$habilidad_comp) <- "Y observando a tus compñaeros, ¿Cómo los consideras en términos de sus habilidades naturales?"
 label(data_est$oportunidades) <- "En Chile, las personas tienen igualdad de oportunidades para salir adelante"
 label(data_est$esfuerzo) <- "En Chile, las personas son recompensadas por sus esfuerzos"
 label(data_est$merito) <- "En Chile, las personas obtienen lo que merecen"

@@ -353,9 +353,18 @@ pre code {
 
 
 <pre class="r"><code>pacman::p_load(haven, dplyr, summarytools, sjmisc, car)
-alumnos &lt;- read_dta(&quot;input/data/cuestAlumnos.dta&quot;)
-apoderados &lt;- read_dta(&quot;input/data/cuestPadres.dta&quot;)</code></pre>
-<pre class="r"><code>data_est &lt;- alumnos %&gt;% dplyr::select(oportunidades=alp38_1,
+alumnos &lt;- read_dta(&quot;input/data/original/cuestAlumnos.dta&quot;)
+apoderados &lt;- read_dta(&quot;input/data/original/cuestPadres.dta&quot;)</code></pre>
+<pre class="r"><code>data_est &lt;- alumnos %&gt;% dplyr::select(import_inteligencia=alp6_1,
+                                      import_esfuerzo=alp6_2,
+                                      int_esfuerzo=P7,
+                                      esfuerzo_cambio=alp8,
+                                      esfuerzo_ref=alp9,
+                                      esfuerzo_comp=alp10,
+                                      habilidad_cambio=alp11,
+                                      habilidad_ref=alp12,
+                                      habilidad_comp=alp13,
+                                      oportunidades=alp38_1,
                                        esfuerzo=alp38_2,
                                        merito=alp38_3,
                                        inteligencia=alp38_4,
@@ -376,10 +385,28 @@ data_apod &lt;- apoderados %&gt;% dplyr::select(oportunidades=pap25_1,
                                        just_salud=pap26_3,
                                        redistribucion=pap26_4
                                        ) %&gt;% as.data.frame(.)</code></pre>
-<pre class="r"><code>data_est &lt;- data_est %&gt;%  set_na(oportunidades, esfuerzo, merito, inteligencia, dif_ingresos, just_pension, just_educ, just_salud, redistribucion, na = c(0,99), drop.levels = TRUE, as.tag = FALSE) # recode missings de doble marca (99) y vacío (0) a NA
+<pre class="r"><code>data_est &lt;- data_est %&gt;%  set_na(import_inteligencia, import_esfuerzo, int_esfuerzo, esfuerzo_cambio, esfuerzo_ref, esfuerzo_comp, habilidad_cambio, habilidad_ref, habilidad_comp, oportunidades, esfuerzo, merito, inteligencia, dif_ingresos, just_pension, just_educ, just_salud, redistribucion, na = c(0,99), drop.levels = TRUE, as.tag = FALSE) # recode missings de doble marca (99) y vacío (0) a NA
 
 data_apod &lt;- data_apod %&gt;%  set_na(oportunidades, esfuerzo, merito, inteligencia, dif_ingresos, just_pension, just_educ, just_salud, redistribucion, na = c(0,99), drop.levels = TRUE, as.tag = FALSE) # recode missings de doble marca (99) y vacío (0) a NA</code></pre>
+<pre class="r"><code># categorias de respuesta
+data_est$int_esfuerzo=factor(data_est$int_esfuerzo, labels=c(&quot;Inteligencia&quot;, &quot;Esfuerzo&quot;))
+data_est$esfuerzo_cambio=factor(data_est$esfuerzo_cambio, labels=c(&quot;El nivel de esfuerzo puede cambiar&quot;, &quot;El nivel de esfuerzo no puede cambiar&quot;))
+data_est$esfuerzo_ref=factor(data_est$esfuerzo_ref, labels=c(&quot;Te esfuerzas menos que la mayoria de tus compañeros&quot;, &quot;Te esfuerzas igual que la mayoria de tus compañeros&quot;, &quot;Te esfuerzas mas que la mayoria de tus compañeros&quot;))
+data_est$esfuerzo_comp=factor(data_est$esfuerzo_comp, labels=c(&quot;La mayoria se esfuerza&quot;, &quot;Solo unos pocos son esforzados&quot;))
+data_est$habilidad_cambio=factor(data_est$habilidad_cambio, labels=c(&quot;El nivel de habilidad puede cambiar&quot;, &quot;El nivel de habilidad no puede cambiar&quot;))
+data_est$habilidad_ref=factor(data_est$habilidad_ref, labels=c(&quot;Eres menos habil que la mayoria de tus compañeros&quot;, &quot;Eres igual de habil que la mayoria de tus compañeros&quot;, &quot;Eres mas habil que la mayoria de tus compañeros&quot;))
+data_est$habilidad_comp=factor(data_est$habilidad_comp, labels=c(&quot;La mayoria son naturalmente habiles&quot;, &quot;Solo unos pocos son naturalmente habiles&quot;))</code></pre>
 <pre class="r"><code># estudiantes
+
+label(data_est$import_inteligencia) &lt;- &quot;La inteligencia es importante para obtener buenas notas&quot;
+label(data_est$import_esfuerzo) &lt;- &quot;El esfuerzo es importante para obtener buenas notas&quot;
+label(data_est$int_esfuerzo) &lt;- &quot;Qué consideras más importante para poder obtener buenos resultados en la escuela&quot;
+label(data_est$esfuerzo_cambio) &lt;- &quot;Algunas personas creen que el nivel de esfuerzo puede cambiar en el tiempo y otros dicen que eso no es posible. Con qué afirmación te identificas más&quot;
+label(data_est$esfuerzo_ref) &lt;- &quot;Tomando en cuenta el esfuerzo que diariamente le dedicas a las diferentes actividades académicas en la escuela, crees que&quot;
+label(data_est$esfuerzo_comp) &lt;- &quot;Pensando en el esfuerzo que la mayoría de tus compañeros le dedica al trabajo académico, crees que&quot;
+label(data_est$habilidad_cambio) &lt;- &quot;Algunas personas creen que la habilidad de una persona es algo que no puede cambiar, otras consideran que sí es posible. Con qué afirmación te identificas más&quot;
+label(data_est$habilidad_ref) &lt;- &quot;Teniendo como referencia las habilidades de tus compañeros de curso, cres que&quot;
+label(data_est$habilidad_comp) &lt;- &quot;Y observando a tus compñaeros, ¿Cómo los consideras en términos de sus habilidades naturales?&quot;
 label(data_est$oportunidades) &lt;- &quot;En Chile, las personas tienen igualdad de oportunidades para salir adelante&quot;
 label(data_est$esfuerzo) &lt;- &quot;En Chile, las personas son recompensadas por sus esfuerzos&quot;
 label(data_est$merito) &lt;- &quot;En Chile, las personas obtienen lo que merecen&quot;
@@ -421,6 +448,125 @@ label(data_apod$redistribucion) &lt;- &quot;El Gobierno de Chile debería hacer 
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td align="left">import_inteligencia
+[numeric]</td>
+      <td align="left">La inteligencia es importante para
+obtener buenas notas</td>
+      <td align="left" style="padding:8;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">Mean (sd) : 3 (0.8)</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">min ≤ med ≤ max:</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">1 ≤ 3 ≤ 4</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">IQR (CV) : 1 (0.3)</td></tr></table></td>
+      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">1</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">516</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">6.3%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">2</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">1288</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">15.7%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">3</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">4027</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">49.1%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">4</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">2378</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">29.0%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr></table></td>
+      <td align="center">8209
+(95.6%)</td>
+      <td align="center">380
+(4.4%)</td>
+    </tr>
+    <tr>
+      <td align="left">import_esfuerzo
+[numeric]</td>
+      <td align="left">El esfuerzo es importante para obtener
+buenas notas</td>
+      <td align="left" style="padding:8;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">Mean (sd) : 3.7 (0.6)</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">min ≤ med ≤ max:</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">1 ≤ 4 ≤ 4</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">IQR (CV) : 1 (0.2)</td></tr></table></td>
+      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">1</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">159</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">1.9%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">2</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">130</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">1.6%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">3</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">2006</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">24.4%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">4</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">5925</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">72.1%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr></table></td>
+      <td align="center">8220
+(95.7%)</td>
+      <td align="center">369
+(4.3%)</td>
+    </tr>
+    <tr>
+      <td align="left">int_esfuerzo
+[factor]</td>
+      <td align="left">Qué consideras más importante para
+poder obtener buenos resultados en la
+escuela</td>
+      <td align="left" style="padding:8;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">1. Inteligencia</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">2. Esfuerzo</td></tr></table></td>
+      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1124</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">13.2%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">7371</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">86.8%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
+      <td align="center">8495
+(98.9%)</td>
+      <td align="center">94
+(1.1%)</td>
+    </tr>
+    <tr>
+      <td align="left">esfuerzo_cambio
+[factor]</td>
+      <td align="left">Algunas personas creen que el nivel de
+esfuerzo puede cambiar en el tiempo y
+otros dicen que eso no es posible. Con
+qué afirmación te identificas más</td>
+      <td align="left" style="padding:8;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">1. El nivel de esfuerzo pued</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">2. El nivel de esfuerzo no p</td></tr></table></td>
+      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">8084</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">95.0%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">428</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">5.0%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
+      <td align="center">8512
+(99.1%)</td>
+      <td align="center">77
+(0.9%)</td>
+    </tr>
+    <tr>
+      <td align="left">esfuerzo_ref
+[factor]</td>
+      <td align="left">Tomando en cuenta el esfuerzo que
+diariamente le dedicas a las diferentes
+actividades académicas en la escuela,
+crees que</td>
+      <td align="left" style="padding:8;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">1. Te esfuerzas menos que la</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">2. Te esfuerzas igual que la</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">3. Te esfuerzas mas que la m</td></tr></table></td>
+      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1741</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">20.5%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">4975</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">58.7%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1759</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">20.8%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
+      <td align="center">8475
+(98.7%)</td>
+      <td align="center">114
+(1.3%)</td>
+    </tr>
+    <tr>
+      <td align="left">esfuerzo_comp
+[factor]</td>
+      <td align="left">Pensando en el esfuerzo que la mayoría
+de tus compañeros le dedica al trabajo
+académico, crees que</td>
+      <td align="left" style="padding:8;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">1. La mayoria se esfuerza</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">2. Solo unos pocos son esfor</td></tr></table></td>
+      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">3823</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">45.0%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">4671</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">55.0%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
+      <td align="center">8494
+(98.9%)</td>
+      <td align="center">95
+(1.1%)</td>
+    </tr>
+    <tr>
+      <td align="left">habilidad_cambio
+[factor]</td>
+      <td align="left">Algunas personas creen que la habilidad
+de una persona es algo que no puede
+cambiar, otras consideran que sí es
+posible. Con qué afirmación te
+identificas más</td>
+      <td align="left" style="padding:8;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">1. El nivel de habilidad pue</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">2. El nivel de habilidad no </td></tr></table></td>
+      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">7494</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">88.6%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">969</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">11.4%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
+      <td align="center">8463
+(98.5%)</td>
+      <td align="center">126
+(1.5%)</td>
+    </tr>
+    <tr>
+      <td align="left">habilidad_ref
+[factor]</td>
+      <td align="left">Teniendo como referencia las
+habilidades de tus compañeros de curso,
+cres que</td>
+      <td align="left" style="padding:8;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">1. Eres menos habil que la m</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">2. Eres igual de habil que l</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">3. Eres mas habil que la may</td></tr></table></td>
+      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1095</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">12.9%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">5750</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">67.7%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1645</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">19.4%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
+      <td align="center">8490
+(98.8%)</td>
+      <td align="center">99
+(1.2%)</td>
+    </tr>
+    <tr>
+      <td align="left">habilidad_comp
+[factor]</td>
+      <td align="left">Y observando a tus compñaeros, ¿Cómo
+los consideras en términos de sus
+habilidades naturales?</td>
+      <td align="left" style="padding:8;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">1. La mayoria son naturalmen</td></tr><tr style="background-color:transparent"><td style="padding:0;margin:0;border:0" align="left">2. Solo unos pocos son natur</td></tr></table></td>
+      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">5443</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">64.4%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">3007</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">35.6%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
+      <td align="center">8450
+(98.4%)</td>
+      <td align="center">139
+(1.6%)</td>
+    </tr>
     <tr>
       <td align="left">oportunidades
 [numeric]</td>
