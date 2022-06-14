@@ -39,4 +39,8 @@ Variables disponibles:
 | El Gobierno de Chile debería hacer algo para reducir las diferencias de ingreso entre ricos y pobres | Muy desacuerdo a muy de acuerdo | Si | Si |
 
 
-Tablas con estadísticos descriptivos disponible en: https://htmlpreview.github.io/?https://github.com/educacion-meritocracia/meritocracia-escuela-agencia/blob/main/processing/descriptivos-meritocracia.html
+Tablas con estadísticos descriptivos disponible en: https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/processing/descriptivos-meritocracia.html
+
+Modelos multinivel disponibles en:
+https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/processing/analisis-multinivel.html
+
