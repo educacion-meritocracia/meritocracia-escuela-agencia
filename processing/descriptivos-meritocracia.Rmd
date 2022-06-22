@@ -2,7 +2,14 @@
 title: "descriptivos-meritocracia"
 author: "Equipo EDUMER"
 date: "29-11-2021"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
+    code_folding: hide
+    toc_float: 
+      collapsed: true
+      smooth_scroll: false
+      number_sections: true
 ---
 
 ```{r}
@@ -18,6 +25,8 @@ data_est <- base_estudiantes %>% dplyr::select(idalumno,
                                                mrbd,
                                                cod_depe2, #dependencia administrativa
                                                cod_grupo, #categorizacion socioeconomica
+                                               simce_lect=prom_lect8b_rbd, #Promedio lectura escuela
+                                               simce_mate=prom_mate8b_rbd, # Promedio matematica escuela
                                                inteligencia_esc=est_p6_1, # inteligencia escolar
                                                esfuerzo_esc=est_p6_2, # esfuerzo escolar
                                                esfuerzo_soc=est_p38_2, #esfuerzo social
