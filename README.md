@@ -43,3 +43,13 @@ Variables disponibles:
 
 [Modelos multinivel](https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/processing/analisis-multinivel.html)
 
+Modelos ordinal logit:
+
+- [Justo-desigualdad-pensiones](https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/processing/01-justpension.html)
+
+- [Justo-desigualdad-educacion](https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/processing/02-justeduc.html)
+
+- [Justo-desigualdad-salud](https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/processing/03-justsalud.html)
+
+- [Redistribucion-gob](https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/processing/04-redis.html)
+
