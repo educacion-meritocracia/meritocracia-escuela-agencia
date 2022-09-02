@@ -1655,6 +1655,10 @@ data &lt;- data %&gt;% rowwise() %&gt;%  mutate(educacion_rec = case_when(educac
                                                  ))
 data$educacion_rec &lt;- factor(data$educacion_rec, levels = c(&quot;Ed Basica&quot;, &quot;Ed Media&quot;, &quot;Ed Tecnica&quot;, &quot;Universidad o posgrado&quot;, &quot;Ns/Nr&quot;))
 
+## Proporcion de Universidad o posgrado por escuela
+data &lt;- data %&gt;% group_by(mrbd) %&gt;%
+  mutate(mean_educ = mean(educacion_rec==&quot;Universidad o posgrado&quot;, na.rm=T))
+
 # Internet
 data$internet &lt;- factor(data$internet, labels = c(&quot;Si&quot;, &quot;No&quot;))
 data$internet_rec &lt;- ifelse(is.na(data$internet), &quot;Ns/Nr&quot;, data$internet)
@@ -1728,10 +1732,11 @@ reg5_redis &lt;- clmm(redistribucion_fact ~ 1 + inteligencia_esc + (1 | mrbd), d
 reg6_redis &lt;- clmm(redistribucion_fact ~ 1 + educacion_rec + (1 | mrbd), data=data_redis)
 reg7_redis &lt;- clmm(redistribucion_fact ~ 1 + libros_rec + (1 | mrbd), data=data_redis)
 reg8_redis &lt;- clmm(redistribucion_fact ~ 1 + acc_tec + (1 | mrbd), data=data_redis)
-reg9_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 | mrbd), data=data_redis)</code></pre>
+reg9_redis &lt;- clmm(redistribucion_fact ~ 1 + mean_educ + (1 | mrbd), data=data_redis)
+reg10.1_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>htmlreg(list(reg0_redis, reg1_redis, reg2_redis, reg3_redis, reg4_redis, reg5_redis, reg6_redis, reg7_redis, reg8_redis, reg9_redis), 
+<pre class="r"><code>htmlreg(list(reg0_redis, reg1_redis, reg2_redis, reg3_redis, reg4_redis, reg5_redis, reg6_redis, reg7_redis, reg8_redis, reg9_redis, reg10.1_redis), 
         custom.model.names = c(&quot;Nulo&quot;,
                                &quot;Modelo 1&quot;,
                                &quot;Modelo 2&quot;,
@@ -1741,7 +1746,8 @@ reg9_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inte
                                &quot;Modelo 6&quot;,
                                &quot;Modelo 7&quot;,
                                &quot;Modelo 8&quot;,
-                               &quot;Modelo 9&quot;), 
+                               &quot;Modelo 9&quot;,
+                               &quot;Modelo 10&quot;), 
         custom.note = &quot;$***p &lt;$ 0.001, $**p &lt;$ 0.01, $*p &lt;$ 0.05&quot;, 
         omit.coef = &quot;(internet_rec)&quot;,
         custom.coef.names = c(&quot;Muy desacuerdo|Desacuerdo&quot;,
@@ -1756,7 +1762,8 @@ reg9_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inte
                               &quot;Ed tecnica&quot;, &quot;Universidad o posgrado&quot;, 
                               &quot;Ns/Nr&quot;, 
                               &quot;Más de 25 libros &lt;br&gt; &lt;i&gt;(Ref. Menos de 25)&lt;/i&gt;&quot;, 
-                              &quot;Acceso a tecnología&quot;, 
+                              &quot;Acceso a tecnología&quot;,
+                              &quot;Prop. universitarios escuela&quot;,
                               &quot;Part. subv &lt;br&gt; &lt;i&gt;(Ref. Municipal)&lt;/i&gt;&quot;, 
                               &quot;Part. priv&quot;, 
                               &quot;SES Medio bajo &lt;br&gt; &lt;i&gt;(Ref. Bajo)&lt;/i&gt;&quot;, 
@@ -1804,6 +1811,9 @@ Modelo 8
 <th style="padding-left: 5px;padding-right: 5px;">
 Modelo 9
 </th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Modelo 10
+</th>
 </tr>
 </thead>
 <tbody>
@@ -1839,7 +1849,10 @@ Muy desacuerdo|Desacuerdo
 -2.52<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.44<sup>*</sup>
+-2.45<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.46<sup>*</sup>
 </td>
 </tr>
 <tr>
@@ -1872,6 +1885,9 @@ Muy desacuerdo|Desacuerdo
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.06)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.21)
@@ -1909,7 +1925,10 @@ Desacuerdo|De acuerdo
 -1.46<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.63<sup>**</sup>
+-1.39<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.62<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -1942,6 +1961,9 @@ Desacuerdo|De acuerdo
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.21)
@@ -1979,7 +2001,10 @@ De acuerdo|Muy de acuerdo
 0.22<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-2.35<sup>***</sup>
+0.29<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.33<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -2012,6 +2037,9 @@ De acuerdo|Muy de acuerdo
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.21)
@@ -2049,7 +2077,10 @@ Esfuerzo social
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.07
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
 </td>
 </tr>
 <tr>
@@ -2061,6 +2092,9 @@ Esfuerzo social
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2119,6 +2153,9 @@ Merito social
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 -0.04
 </td>
 </tr>
@@ -2134,6 +2171,9 @@ Merito social
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2189,6 +2229,9 @@ Inteligencia social
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 0.23<sup>***</sup>
 </td>
 </tr>
@@ -2207,6 +2250,9 @@ Inteligencia social
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2259,6 +2305,9 @@ Esfuerzo escolar
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 0.37<sup>***</sup>
 </td>
 </tr>
@@ -2280,6 +2329,9 @@ Esfuerzo escolar
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2329,6 +2381,9 @@ Inteligencia escolar
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 -0.08<sup>**</sup>
 </td>
 </tr>
@@ -2353,6 +2408,9 @@ Inteligencia escolar
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2399,7 +2457,10 @@ Ed media <br> <i>(Ref. Ed Basica)</i>
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.15
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
 </td>
 </tr>
 <tr>
@@ -2426,6 +2487,9 @@ Ed media <br> <i>(Ref. Ed Basica)</i>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2469,6 +2533,9 @@ Ed tecnica
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 0.29<sup>*</sup>
 </td>
 </tr>
@@ -2496,6 +2563,9 @@ Ed tecnica
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2539,7 +2609,10 @@ Universidad o posgrado
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.25<sup>*</sup>
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.26<sup>*</sup>
 </td>
 </tr>
 <tr>
@@ -2566,6 +2639,9 @@ Universidad o posgrado
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2609,6 +2685,9 @@ Ns/Nr
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 0.17
 </td>
 </tr>
@@ -2636,6 +2715,9 @@ Ns/Nr
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2679,6 +2761,9 @@ Más de 25 libros <br> <i>(Ref. Menos de 25)</i>
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 0.21<sup>***</sup>
 </td>
 </tr>
@@ -2709,6 +2794,9 @@ Más de 25 libros <br> <i>(Ref. Menos de 25)</i>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -2749,6 +2837,9 @@ Acceso a tecnología
 -0.00
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 -0.02
 </td>
 </tr>
@@ -2784,7 +2875,86 @@ Acceso a tecnología
 (0.01)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 (0.01)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Prop. universitarios escuela
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.55<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.47
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.44)
 </td>
 </tr>
 <tr>
@@ -2819,10 +2989,16 @@ Part. subv <br> <i>(Ref. Municipal)</i>
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
 </td>
 </tr>
 <tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
 </td>
@@ -2889,7 +3065,10 @@ Part. priv
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.00
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
 </td>
 </tr>
 <tr>
@@ -2924,7 +3103,10 @@ Part. priv
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.20)
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
 </td>
 </tr>
 <tr>
@@ -2959,10 +3141,16 @@ SES Medio bajo <br> <i>(Ref. Bajo)</i>
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.05
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
 </td>
 </tr>
 <tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
 </td>
@@ -3029,10 +3217,16 @@ SES Medio
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.03
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
 </td>
 </tr>
 <tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
 </td>
@@ -3099,7 +3293,10 @@ SES Medio alto
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.35<sup>**</sup>
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.43<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -3134,7 +3331,10 @@ SES Medio alto
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.15)
 </td>
 </tr>
 <tr>
@@ -3169,7 +3369,10 @@ SES Alto
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.25
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.17
 </td>
 </tr>
 <tr>
@@ -3204,7 +3407,10 @@ SES Alto
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.21)
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
 </td>
 </tr>
 <tr>
@@ -3239,10 +3445,16 @@ Simce_Medio <i>(Ref. Bajo)</i>
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 0.11
 </td>
 </tr>
 <tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
 </td>
@@ -3309,10 +3521,16 @@ Simce_alto
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.27<sup>**</sup>
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>***</sup>
 </td>
 </tr>
 <tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
 </td>
@@ -3379,7 +3597,10 @@ Log Likelihood
 -8078.96
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--7953.45
+-8076.53
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7952.87
 </td>
 </tr>
 <tr>
@@ -3414,7 +3635,10 @@ AIC
 16167.93
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15956.90
+16163.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15957.74
 </td>
 </tr>
 <tr>
@@ -3449,12 +3673,18 @@ BIC
 16202.15
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16128.00
+16197.28
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16135.69
 </td>
 </tr>
 <tr>
 <td style="padding-left: 5px;padding-right: 5px;">
 Num. obs.
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 6933
@@ -3521,6 +3751,9 @@ Groups (mrbd)
 <td style="padding-left: 5px;padding-right: 5px;">
 241
 </td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
 </tr>
 <tr style="border-bottom: 2px solid #000000;">
 <td style="padding-left: 5px;padding-right: 5px;">
@@ -3554,13 +3787,16 @@ Variance: mrbd: (Intercept)
 0.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 0.03
 </td>
 </tr>
 </tbody>
 <tfoot>
 <tr>
-<td style="font-size: 0.8em;" colspan="11">
+<td style="font-size: 0.8em;" colspan="12">
 <span class="math inline">\(***p &lt;\)</span> 0.001, <span class="math inline">\(**p &lt;\)</span> 0.01, <span class="math inline">\(*p &lt;\)</span> 0.05
 </td>
 </tr>
@@ -3569,27 +3805,22 @@ Variance: mrbd: (Intercept)
 <div id="interacciones" class="section level3">
 <h3>Interacciones</h3>
 <p><em>meritocracia x ses familiar (educacion)</em></p>
-<pre class="r"><code>reg10_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*esfuerzo_soc + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg10_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*esfuerzo_soc + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg11_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*merito_soc + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg11_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*merito_soc + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg12_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*inteligencia_soc + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg12_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*inteligencia_soc + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg13_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*esfuerzo_esc + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg13_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*esfuerzo_esc + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg14_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*inteligencia_esc + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg14_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec*inteligencia_esc + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + educacion_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>htmlreg(list(reg9_redis, reg10_redis, reg11_redis, reg12_redis, reg13_redis, reg14_redis))</code></pre>
-<pre><code>## Warning in summary.clmm(model, ...): Variance-covariance matrix of the
-## parameters is not defined
-
-## Warning in summary.clmm(model, ...): Variance-covariance matrix of the
-## parameters is not defined</code></pre>
+<pre class="r"><code>htmlreg(list(reg10.1_redis, reg10_redis, reg11_redis, reg12_redis, reg13_redis, reg14_redis))</code></pre>
 <table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
 <caption>
 Statistical models
@@ -3625,13 +3856,13 @@ Model 6
 esfuerzo_soc
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.07
+0.06
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.11
+0.10
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.07
+0.06
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.06
@@ -3651,7 +3882,7 @@ esfuerzo_soc
 (0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.12)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.04)
@@ -3660,7 +3891,7 @@ esfuerzo_soc
 (0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.04)
@@ -3674,19 +3905,19 @@ merito_soc
 -0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.04
+-0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.02
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 -0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.04
+-0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.04
+-0.03
 </td>
 </tr>
 <tr>
@@ -3697,7 +3928,7 @@ merito_soc
 (0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.12)
@@ -3706,7 +3937,7 @@ merito_soc
 (0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.04)
@@ -3720,7 +3951,7 @@ inteligencia_soc
 0.23<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.22
+0.23<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.23<sup>***</sup>
@@ -3729,7 +3960,7 @@ inteligencia_soc
 0.29<sup>*</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.22
+0.22<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.22<sup>***</sup>
@@ -3743,7 +3974,7 @@ inteligencia_soc
 (0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.04)
@@ -3752,7 +3983,7 @@ inteligencia_soc
 (0.11)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.04)
@@ -3766,16 +3997,16 @@ esfuerzo_esc
 0.37<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.37
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 0.37<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.37<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.39
+0.37<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.39<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.37<sup>***</sup>
@@ -3789,16 +4020,16 @@ esfuerzo_esc
 (0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.04)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.04)
@@ -3812,16 +4043,16 @@ inteligencia_esc
 -0.08<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.08
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 -0.08<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 -0.08<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.08
+-0.08<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 -0.09
@@ -3835,16 +4066,16 @@ inteligencia_esc
 (0.03)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.03)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.03)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.03)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.12)
@@ -3855,19 +4086,19 @@ inteligencia_esc
 educacion_recEd Media
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.15
+0.14
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.34
+0.31
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.36
+0.37
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.57
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.84
+0.82
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.08
@@ -3881,16 +4112,16 @@ educacion_recEd Media
 (0.10)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.38)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.39)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.38)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.38)
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.61)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.43)
@@ -3904,10 +4135,10 @@ educacion_recEd Tecnica
 0.29<sup>*</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.54
+0.53
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.61
+0.63
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.55
@@ -3927,7 +4158,7 @@ educacion_recEd Tecnica
 (0.12)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.41)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.41)
@@ -3936,10 +4167,10 @@ educacion_recEd Tecnica
 (0.40)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.67)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.46)
+(0.47)
 </td>
 </tr>
 <tr>
@@ -3947,22 +4178,22 @@ educacion_recEd Tecnica
 educacion_recUniversidad o posgrado
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.25<sup>*</sup>
+0.26<sup>*</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.57
+0.56
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.68
+0.71
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.65
+0.66
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.15
+0.16
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.03
+0.05
 </td>
 </tr>
 <tr>
@@ -3973,7 +4204,7 @@ educacion_recUniversidad o posgrado
 (0.12)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.39)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.40)
@@ -3982,7 +4213,7 @@ educacion_recUniversidad o posgrado
 (0.39)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.72)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.44)
@@ -3996,19 +4227,19 @@ educacion_recNs/Nr
 0.17
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.19
+0.17
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.15
+0.16
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.20
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.07
+0.05
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.15
+0.14
 </td>
 </tr>
 <tr>
@@ -4019,7 +4250,7 @@ educacion_recNs/Nr
 (0.10)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.35)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.36)
@@ -4028,7 +4259,7 @@ educacion_recNs/Nr
 (0.35)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.58)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.40)
@@ -4042,16 +4273,16 @@ libros_recMás de 25
 0.21<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.22
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 0.22<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.22<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.22
+0.22<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.21<sup>***</sup>
@@ -4065,16 +4296,16 @@ libros_recMás de 25
 (0.05)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.05)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.05)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.05)
@@ -4111,19 +4342,65 @@ acc_tec
 (0.01)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.47
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.47
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.47
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.48
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.47
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.47
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.01)
+(0.44)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.01)
+(0.45)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.45)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.01)
+(0.45)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.45)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.45)
 </td>
 </tr>
 <tr>
@@ -4131,22 +4408,22 @@ acc_tec
 cod_depe2Part. subvencionado
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.03
+0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.03
+0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.03
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.03
+0.04
 </td>
 </tr>
 <tr>
@@ -4157,16 +4434,16 @@ cod_depe2Part. subvencionado
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
@@ -4177,22 +4454,22 @@ cod_depe2Part. subvencionado
 cod_depe2Part. privado
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.00
+0.08
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.10
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.00
+0.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.10
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.10
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.10
 </td>
 </tr>
 <tr>
@@ -4200,22 +4477,22 @@ cod_depe2Part. privado
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.20)
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.20)
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.20)
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.20)
+(0.22)
 </td>
 </tr>
 <tr>
@@ -4223,16 +4500,16 @@ cod_depe2Part. privado
 cod_grupoMedio bajo
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.05
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 0.06
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.06
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.05
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.06
@@ -4249,16 +4526,16 @@ cod_grupoMedio bajo
 (0.09)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.09)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.09)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.09)
@@ -4269,22 +4546,22 @@ cod_grupoMedio bajo
 cod_grupoMedio
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.03
+0.06
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.04
+0.05
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.04
+0.05
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.05
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.04
+0.05
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.04
+0.05
 </td>
 </tr>
 <tr>
@@ -4295,19 +4572,19 @@ cod_grupoMedio
 (0.11)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.12)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.11)
+(0.12)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.11)
+(0.12)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.12)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.11)
+(0.12)
 </td>
 </tr>
 <tr>
@@ -4315,22 +4592,22 @@ cod_grupoMedio
 cod_grupoMedio alto
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.35<sup>**</sup>
+0.43<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.36
+0.44<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.36<sup>**</sup>
+0.44<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.36<sup>**</sup>
+0.45<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.36
+0.44<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.36<sup>**</sup>
+0.44<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -4338,22 +4615,22 @@ cod_grupoMedio alto
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.13)
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.15)
 </td>
 </tr>
 <tr>
@@ -4361,22 +4638,22 @@ cod_grupoMedio alto
 cod_grupoAlto
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.25
+-0.17
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.26
+-0.20
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.25
+-0.20
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.27
+-0.20
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.26
+-0.20
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.26
+-0.20
 </td>
 </tr>
 <tr>
@@ -4384,22 +4661,22 @@ cod_grupoAlto
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.21)
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.21)
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.21)
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.20)
+(0.22)
 </td>
 </tr>
 <tr>
@@ -4422,7 +4699,7 @@ simceMedio
 0.11
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.11
+0.10
 </td>
 </tr>
 <tr>
@@ -4433,16 +4710,16 @@ simceMedio
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
@@ -4453,22 +4730,22 @@ simceMedio
 simceAlto
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.27<sup>**</sup>
+0.29<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.28
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.28<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.28<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.28
+0.30<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.29<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -4479,19 +4756,19 @@ simceAlto
 (0.08)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-(0.08)
+(0.09)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.09)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.09)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.08)
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
 </td>
 </tr>
 <tr>
@@ -4508,7 +4785,7 @@ internet_rec2
 0.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.09
+0.08
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.09
@@ -4525,16 +4802,16 @@ internet_rec2
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
@@ -4545,22 +4822,22 @@ internet_rec2
 internet_recNs/Nr
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 -0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 -0.02
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.02
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--0.02
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--0.02
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--0.02
+-0.03
 </td>
 </tr>
 <tr>
@@ -4571,16 +4848,16 @@ internet_recNs/Nr
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.07)
@@ -4591,22 +4868,22 @@ internet_recNs/Nr
 1|2
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.44<sup>*</sup>
+-0.46<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.36
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 -0.32
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.31
+-0.28
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.27
+-0.39
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.35
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--0.46
+-0.49
 </td>
 </tr>
 <tr>
@@ -4617,16 +4894,16 @@ internet_recNs/Nr
 (0.21)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.37)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.38)
+(0.39)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.37)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.56)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.41)
@@ -4637,22 +4914,22 @@ internet_recNs/Nr
 2|3
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.63<sup>**</sup>
+0.62<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.76
+0.72
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.77<sup>*</sup>
+0.76<sup>*</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.81<sup>*</sup>
+0.80<sup>*</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.73
+0.69
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.61
+0.59
 </td>
 </tr>
 <tr>
@@ -4663,16 +4940,16 @@ internet_recNs/Nr
 (0.21)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.37)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.38)
+(0.39)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.37)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.55)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.41)
@@ -4683,22 +4960,22 @@ internet_recNs/Nr
 3|4
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-2.35<sup>***</sup>
+2.33<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-2.49
+2.44<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 2.49<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-2.54<sup>***</sup>
+2.53<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-2.46
+2.42<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-2.34<sup>***</sup>
+2.32<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -4709,19 +4986,19 @@ internet_recNs/Nr
 (0.21)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.37)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.38)
+(0.39)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 (0.37)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.56)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.41)
+(0.42)
 </td>
 </tr>
 <tr>
@@ -4732,7 +5009,7 @@ esfuerzo_soc:educacion_recEd Media
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.07
+-0.06
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -4755,7 +5032,7 @@ esfuerzo_soc:educacion_recEd Media
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.13)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -4801,7 +5078,7 @@ esfuerzo_soc:educacion_recEd Tecnica
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.14)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -4824,7 +5101,7 @@ esfuerzo_soc:educacion_recUniversidad o posgrado
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.12
+-0.11
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -4847,7 +5124,7 @@ esfuerzo_soc:educacion_recUniversidad o posgrado
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.14)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -4870,7 +5147,7 @@ esfuerzo_soc:educacion_recNs/Nr
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.01
+-0.00
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -4893,7 +5170,7 @@ esfuerzo_soc:educacion_recNs/Nr
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.12)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -4919,7 +5196,7 @@ merito_soc:educacion_recEd Media
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.07
+-0.08
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -4965,7 +5242,7 @@ merito_soc:educacion_recEd Tecnica
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.11
+-0.12
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -4988,7 +5265,7 @@ merito_soc:educacion_recEd Tecnica
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.14)
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -5011,7 +5288,7 @@ merito_soc:educacion_recUniversidad o posgrado
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.16
+-0.17
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -5057,7 +5334,7 @@ merito_soc:educacion_recNs/Nr
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.00
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -5080,7 +5357,7 @@ merito_soc:educacion_recNs/Nr
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.13)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -5316,7 +5593,7 @@ esfuerzo_esc:educacion_recEd Media
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.17)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -5362,7 +5639,7 @@ esfuerzo_esc:educacion_recEd Tecnica
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.18)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -5408,7 +5685,7 @@ esfuerzo_esc:educacion_recUniversidad o posgrado
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.19)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -5454,7 +5731,7 @@ esfuerzo_esc:educacion_recNs/Nr
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
- 
+(0.16)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
  
@@ -5549,7 +5826,7 @@ inteligencia_esc:educacion_recEd Tecnica
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.14)
+(0.15)
 </td>
 </tr>
 <tr>
@@ -5572,7 +5849,7 @@ inteligencia_esc:educacion_recUniversidad o posgrado
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.08
+0.07
 </td>
 </tr>
 <tr>
@@ -5618,7 +5895,7 @@ inteligencia_esc:educacion_recNs/Nr
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.00
 </td>
 </tr>
 <tr>
@@ -5649,22 +5926,22 @@ inteligencia_esc:educacion_recNs/Nr
 Log Likelihood
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--7953.45
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--7948.09
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--7946.56
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--7945.44
+-7952.87
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 -7946.34
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--7948.24
+-7944.73
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7944.87
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7944.51
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7946.49
 </td>
 </tr>
 <tr>
@@ -5672,22 +5949,22 @@ Log Likelihood
 AIC
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15956.90
+15957.74
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15982.19
+15980.69
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15979.11
+15977.47
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15976.88
+15977.75
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15978.69
+15977.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15982.48
+15980.98
 </td>
 </tr>
 <tr>
@@ -5695,22 +5972,22 @@ AIC
 BIC
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16128.00
+16135.69
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16276.48
+16281.83
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16273.41
+16278.60
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16271.17
+16278.88
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16272.98
+16278.16
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16276.77
+16282.11
 </td>
 </tr>
 <tr>
@@ -5767,19 +6044,19 @@ Variance: mrbd: (Intercept)
 0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.00
+0.08
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.00
+0.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.10
+0.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.00
+0.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.00
+0.08
 </td>
 </tr>
 <tr>
@@ -5790,19 +6067,19 @@ Variance: mrbd: educacion_recEd Media
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.04
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.04
+0.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.04
+0.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.04
+0.09
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10
 </td>
 </tr>
 <tr>
@@ -5813,19 +6090,19 @@ Variance: mrbd: educacion_recEd Tecnica
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.24
+0.33
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.24
+0.33
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.32
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.23
+0.32
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.23
+0.33
 </td>
 </tr>
 <tr>
@@ -5836,19 +6113,19 @@ Variance: mrbd: educacion_recUniversidad o posgrado
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.07
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.08
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.07
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
 </td>
 </tr>
 <tr style="border-bottom: 2px solid #000000;">
@@ -5859,19 +6136,19 @@ Variance: mrbd: educacion_recNs/Nr
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.05
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.05
+0.01
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.01
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.04
+0.01
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.04
+0.01
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.01
 </td>
 </tr>
 </tbody>
@@ -5885,22 +6162,22 @@ Variance: mrbd: educacion_recNs/Nr
 </tfoot>
 </table>
 <p><em>meritocracia x ses familiar (libros)</em></p>
-<pre class="r"><code>reg15_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*esfuerzo_soc + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg15_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*esfuerzo_soc + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg16_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*merito_soc + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg16_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*merito_soc + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg17_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*inteligencia_soc + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg17_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*inteligencia_soc + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg18_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*esfuerzo_esc + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg18_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*esfuerzo_esc + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg19_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*inteligencia_esc + acc_tec + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg19_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec*inteligencia_esc + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce + internet_rec + (1 + libros_rec | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>htmlreg(list(reg9_redis, reg15_redis, reg16_redis, reg17_redis, reg18_redis, reg19_redis))</code></pre>
+<pre class="r"><code>htmlreg(list(reg10.1_redis, reg15_redis, reg16_redis, reg17_redis, reg18_redis, reg19_redis))</code></pre>
 <table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
 <caption>
 Statistical models
@@ -5936,10 +6213,10 @@ Model 6
 esfuerzo_soc
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.07
+0.06
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.09
+0.08
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.07
@@ -6089,7 +6366,7 @@ esfuerzo_esc
 0.38<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.37<sup>***</sup>
+0.36<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -6166,7 +6443,7 @@ inteligencia_esc
 educacion_recEd Media
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.15
+0.14
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.15
@@ -6258,7 +6535,7 @@ educacion_recEd Tecnica
 educacion_recUniversidad o posgrado
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.25<sup>*</sup>
+0.26<sup>*</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.25<sup>*</sup>
@@ -6267,10 +6544,10 @@ educacion_recUniversidad o posgrado
 0.25<sup>*</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.24<sup>*</sup>
+0.25<sup>*</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.25<sup>*</sup>
+0.26<sup>*</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.25<sup>*</sup>
@@ -6439,25 +6716,71 @@ acc_tec
 </tr>
 <tr>
 <td style="padding-left: 5px;padding-right: 5px;">
+mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.47
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.33
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.33
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.33
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.33
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.33
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.44)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.45)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.45)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.45)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.45)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.45)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
 cod_depe2Part. subvencionado
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.02
+0.03
 </td>
 </tr>
 <tr>
@@ -6488,22 +6811,22 @@ cod_depe2Part. subvencionado
 cod_depe2Part. privado
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.00
+0.08
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.02
+0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.02
+0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.03
+0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.02
+0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.02
+0.04
 </td>
 </tr>
 <tr>
@@ -6511,22 +6834,22 @@ cod_depe2Part. privado
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.20)
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.22)
+(0.24)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.22)
+(0.24)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.22)
+(0.24)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.22)
+(0.24)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
 </td>
 </tr>
 <tr>
@@ -6534,9 +6857,6 @@ cod_depe2Part. privado
 cod_grupoMedio bajo
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.05
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 0.06
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
@@ -6546,7 +6866,10 @@ cod_grupoMedio bajo
 0.07
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.06
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.07
@@ -6580,22 +6903,22 @@ cod_grupoMedio bajo
 cod_grupoMedio
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
 0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.03
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.01
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.01
+0.03
 </td>
 </tr>
 <tr>
@@ -6626,22 +6949,22 @@ cod_grupoMedio
 cod_grupoMedio alto
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.35<sup>**</sup>
+0.43<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.35<sup>**</sup>
+0.41<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.35<sup>**</sup>
+0.42<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.35<sup>**</sup>
+0.42<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.35<sup>**</sup>
+0.41<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.35<sup>**</sup>
+0.41<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -6649,22 +6972,22 @@ cod_grupoMedio alto
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.15)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.12)
+(0.15)
 </td>
 </tr>
 <tr>
@@ -6672,22 +6995,22 @@ cod_grupoMedio alto
 cod_grupoAlto
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.25
+-0.17
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.19
+-0.15
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.19
+-0.14
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.19
+-0.14
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.19
+-0.15
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.20
+-0.15
 </td>
 </tr>
 <tr>
@@ -6695,22 +7018,22 @@ cod_grupoAlto
  
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.21)
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 (0.22)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.22)
+(0.23)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.22)
+(0.23)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.22)
+(0.23)
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-(0.22)
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
 </td>
 </tr>
 <tr>
@@ -6764,22 +7087,22 @@ simceMedio
 simceAlto
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.27<sup>**</sup>
+0.29<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.28<sup>***</sup>
+0.29<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.28<sup>***</sup>
+0.29<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.28<sup>***</sup>
+0.29<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.28<sup>***</sup>
+0.29<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.28<sup>***</sup>
+0.29<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -6819,10 +7142,10 @@ internet_rec2
 0.07
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.08
+0.07
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.08
+0.07
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.07
@@ -6856,22 +7179,22 @@ internet_rec2
 internet_recNs/Nr
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.03
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 -0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.04
+-0.05
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.04
+-0.05
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.04
+-0.05
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.04
+-0.05
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.05
 </td>
 </tr>
 <tr>
@@ -6902,22 +7225,22 @@ internet_recNs/Nr
 1|2
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.44<sup>*</sup>
+-0.46<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.40
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 -0.39
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.38
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
--0.36
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
 -0.37
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--0.36
+-0.38
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.37
 </td>
 </tr>
 <tr>
@@ -6948,22 +7271,22 @@ internet_recNs/Nr
 2|3
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.63<sup>**</sup>
+0.62<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.68<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.69<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.71<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.69<sup>**</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.70<sup>**</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.72<sup>**</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.70<sup>**</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-0.72<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -6994,22 +7317,22 @@ internet_recNs/Nr
 3|4
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-2.35<sup>***</sup>
+2.33<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.40<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.41<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.43<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 2.41<sup>***</sup>
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 2.42<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-2.44<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-2.42<sup>***</sup>
-</td>
-<td style="padding-left: 5px;padding-right: 5px;">
-2.43<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -7270,22 +7593,22 @@ inteligencia_esc:libros_recMás de 25
 Log Likelihood
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--7953.45
+-7952.87
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--7949.52
+-7949.26
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--7949.36
+-7949.09
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--7948.94
+-7948.67
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--7949.68
+-7949.41
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
--7949.17
+-7948.89
 </td>
 </tr>
 <tr>
@@ -7293,22 +7616,22 @@ Log Likelihood
 AIC
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15956.90
+15957.74
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15955.05
+15956.51
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15954.72
+15956.19
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15953.88
+15955.34
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15955.36
+15956.81
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-15954.34
+15955.79
 </td>
 </tr>
 <tr>
@@ -7316,22 +7639,22 @@ AIC
 BIC
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16128.00
+16135.69
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16146.68
+16154.99
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16146.35
+16154.66
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16145.52
+16153.82
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16147.00
+16155.29
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-16145.98
+16154.27
 </td>
 </tr>
 <tr>
@@ -7417,7 +7740,7 @@ Variance: mrbd: libros_recMás de 25
 0.05
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
-0.05
+0.04
 </td>
 <td style="padding-left: 5px;padding-right: 5px;">
 0.05
@@ -7437,22 +7760,22 @@ Variance: mrbd: libros_recMás de 25
 </tfoot>
 </table>
 <p><em>meritocracia x ses escuela</em></p>
-<pre class="r"><code>reg20_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + cod_grupo*esfuerzo_soc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg20_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + cod_grupo*esfuerzo_soc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg21_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + cod_grupo*merito_soc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg21_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + cod_grupo*merito_soc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg22_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + cod_grupo*inteligencia_soc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg22_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + cod_grupo*inteligencia_soc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg23_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + cod_grupo*esfuerzo_esc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg23_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + cod_grupo*esfuerzo_esc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg24_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + cod_grupo*inteligencia_esc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
+<pre class="r"><code>reg24_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + cod_grupo*inteligencia_esc + simce + internet_rec + (1 + cod_grupo | mrbd), data=data_redis)</code></pre>
 <pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
 ##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>screenreg(list(reg20_redis, reg21_redis, reg22_redis, reg23_redis, reg24_redis))</code></pre>
+<pre class="r"><code>htmlreg(list(reg20_redis, reg21_redis, reg22_redis, reg23_redis, reg24_redis))</code></pre>
 <pre><code>## Warning in summary.clmm(model, ...): Variance-covariance matrix of the
 ## parameters is not defined
 
@@ -7460,6 +7783,3456 @@ Variance: mrbd: libros_recMás de 25
 ## parameters is not defined
 
 ## Warning in summary.clmm(model, ...): Variance-covariance matrix of the
+## parameters is not defined</code></pre>
+<table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
+<caption>
+Statistical models
+</caption>
+<thead>
+<tr>
+<th style="padding-left: 5px;padding-right: 5px;">
+ 
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 1
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 2
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 3
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 4
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top: 1px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.23
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.20<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.36<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.36<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.41
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.36
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.09
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recEd Media
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recEd Tecnica
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recUniversidad o posgrado
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.25
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.26<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.25<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.25
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.25
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recNs/Nr
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.16
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.16
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+libros_recMás de 25
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+acc_tec
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.58
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.59
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.60
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.59
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.57
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.44)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.44)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_depe2Part. subvencionado
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.06)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.06)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_depe2Part. privado
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.09
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.12
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.20)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.20)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoMedio bajo
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.55
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.31
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.10
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.29)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.30)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.81
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.97<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.55
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.32
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.31)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.32)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoMedio alto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.21
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.38<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.27<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.38
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.33)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.34)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.36
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.67
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.65
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.38)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.39)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+simceMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.13
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.13
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.13
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.13
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+simceAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.33
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.34<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.33<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.33
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.33
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+internet_rec2
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+internet_recNs/Nr
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc:cod_grupoMedio bajo
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc:cod_grupoMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.27
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc:cod_grupoMedio alto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.28
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc:cod_grupoAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.19
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+1|2
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.23
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.31
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.48
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.32)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.32)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+2|3
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.10
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.31<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.01<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.76
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.59
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.31)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.31)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+3|4
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.82
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+3.02<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.72<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.48
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.31
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.32)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.32)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc:cod_grupoMedio bajo
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc:cod_grupoMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.33<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc:cod_grupoMedio alto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.35<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc:cod_grupoAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.31<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc:cod_grupoMedio bajo
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc:cod_grupoMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc:cod_grupoMedio alto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.31<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc:cod_grupoAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.05
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc:cod_grupoMedio bajo
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.01
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc:cod_grupoMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc:cod_grupoMedio alto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc:cod_grupoAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.23
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc:cod_grupoMedio bajo
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc:cod_grupoMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc:cod_grupoMedio alto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc:cod_grupoAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.09
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr style="border-top: 1px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+Log Likelihood
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7944.12
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7942.79
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7944.52
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7949.01
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7949.40
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+AIC
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15976.23
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15973.59
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15977.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15986.01
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15986.80
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+BIC
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16277.37
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16274.73
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16278.18
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16287.15
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16287.93
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Num. obs.
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Groups (mrbd)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: (Intercept)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.01
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: cod_grupoMedio bajo
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: cod_grupoMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: cod_grupoMedio alto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.09
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+</tr>
+<tr style="border-bottom: 2px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: cod_grupoAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="font-size: 0.8em;" colspan="6">
+<sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt;
+0.05
+</td>
+</tr>
+</tfoot>
+</table>
+<p><em>meritocracia x prop. educacion universitaria por escuela</em></p>
+<pre class="r"><code>reg20.1_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + mean_educ*esfuerzo_soc + cod_depe2 + cod_grupo + simce + internet_rec + (1 + mean_educ | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>reg21.1_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + mean_educ*merito_soc + cod_depe2 + cod_grupo + simce + internet_rec + (1 + mean_educ | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>reg22.1_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + mean_educ*inteligencia_soc + cod_depe2 + cod_grupo + simce + internet_rec + (1 + mean_educ | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>reg23.1_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + mean_educ*esfuerzo_esc + cod_depe2 + cod_grupo + simce + internet_rec + (1 + mean_educ | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>reg24.1_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + mean_educ*inteligencia_esc + cod_depe2 + cod_grupo + simce + internet_rec + (1 + mean_educ | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>htmlreg(list(reg20.1_redis, reg21.1_redis, reg22.1_redis, reg23.1_redis, reg24.1_redis))</code></pre>
+<table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
+<caption>
+Statistical models
+</caption>
+<thead>
+<tr>
+<th style="padding-left: 5px;padding-right: 5px;">
+ 
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 1
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 2
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 3
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 4
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top: 1px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.23<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.25<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.23<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.23<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.39<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.36<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.06
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recEd Media
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.15
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.15
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.15
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recEd Tecnica
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>*</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recUniversidad o posgrado
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.26<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.26<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.25<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.26<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.26<sup>*</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recNs/Nr
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+libros_recMás de 25
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+acc_tec
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.18
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.64
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.74)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.72)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.74)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(1.19)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.81)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_depe2Part. subvencionado
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_depe2Part. privado
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoMedio bajo
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoMedio alto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.43<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.43<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.43<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.43<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.43<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.15)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.15)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.15)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.15)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.15)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.15
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.15
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.15
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.16
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.16
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+simceMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.12
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.12
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.12
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.12
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+simceAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.30<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.08)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+internet_rec2
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+internet_recNs/Nr
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc:mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.24
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+1|2
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.36
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.29
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.38
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.36
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.39
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.25)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+2|3
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.72<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.79<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.70<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.72<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.68<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.25)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+3|4
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.43<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.50<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.41<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.43<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.40<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.25)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.23)
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc:mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.43
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc:mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.19
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc:mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.21
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.30)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc:mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.14
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.22)
+</td>
+</tr>
+<tr style="border-top: 1px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+Log Likelihood
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7951.57
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7950.28
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7951.83
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7951.95
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7951.98
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+AIC
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15961.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15958.56
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15961.66
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15961.91
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15961.95
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+BIC
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16159.62
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16157.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16160.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16160.38
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16160.43
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Num. obs.
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Groups (mrbd)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: (Intercept)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.02
+</td>
+</tr>
+<tr style="border-bottom: 2px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.16
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.15
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="font-size: 0.8em;" colspan="6">
+<sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt;
+0.05
+</td>
+</tr>
+</tfoot>
+</table>
+<p><em>meritocracia x simce</em></p>
+<pre class="r"><code>reg25_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce*esfuerzo_soc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>reg26_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce*merito_soc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>reg27_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce*inteligencia_soc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>reg28_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce*esfuerzo_esc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>reg29_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo + simce*inteligencia_esc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
+<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
+##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<pre class="r"><code>htmlreg(list(reg25_redis, reg26_redis, reg27_redis, reg28_redis, reg29_redis))</code></pre>
+<pre><code>## Warning in summary.clmm(model, ...): Variance-covariance matrix of the
 ## parameters is not defined
 
 ## Warning in summary.clmm(model, ...): Variance-covariance matrix of the
@@ -7467,69 +11240,1603 @@ Variance: mrbd: libros_recMás de 25
 
 ## Warning in summary.clmm(model, ...): Variance-covariance matrix of the
 ## parameters is not defined</code></pre>
-<p>======================================================================================
-Model 1 Model 2 Model 3 Model 4 Model 5 ————————————————————————————–
-esfuerzo_soc 0.23 0.07 0.07 0.07 0.07 merito_soc -0.03 0.20 -0.04 -0.04
--0.04 inteligencia_soc 0.22 0.22 0.36 0.22 0.22 esfuerzo_esc 0.37 0.37
-0.36 0.40 0.36 inteligencia_esc -0.08 -0.08 -0.08 -0.08 -0.09
-educacion_recEd Media 0.14 0.14 0.14 0.14 0.14 educacion_recEd Tecnica
-0.29 0.29 0.29 0.30 0.29 educacion_recUniversidad o posgrado 0.24 0.24
-0.24 0.24 0.24 educacion_recNs/Nr 0.16 0.17 0.16 0.17 0.17 libros_recMás
-de 25 0.21 0.21 0.21 0.21 0.21 acc_tec -0.02 -0.02 -0.02 -0.02 -0.02
-cod_depe2Part. subvencionado 0.03 0.03 0.03 0.03 0.03 cod_depe2Part.
-privado -0.00 -0.01 0.01 0.01 0.01 cod_grupoMedio bajo 0.29 0.54 0.30
-0.08 -0.11 cod_grupoMedio 0.77 0.92 0.51 0.27 0.06 cod_grupoMedio alto
-1.09 1.26 1.16 0.25 0.27 cod_grupoAlto 0.26 0.57 -0.12 0.54 -0.01
-simceMedio 0.13 0.14 0.13 0.13 0.13 simceAlto 0.31 0.32 0.31 0.31 0.31
-internet_rec2 0.08 0.07 0.08 0.08 0.08 internet_recNs/Nr -0.03 -0.03
--0.03 -0.03 -0.03 esfuerzo_soc:cod_grupoMedio bajo -0.08<br />
-esfuerzo_soc:cod_grupoMedio -0.27<br />
-esfuerzo_soc:cod_grupoMedio alto -0.28<br />
-esfuerzo_soc:cod_grupoAlto -0.19<br />
-1|2 0.04 0.25 -0.05 -0.30 -0.47 2|3 1.12 1.32 1.03 0.77 0.61 3|4 2.83
-3.04 2.74 2.49 2.32 merito_soc:cod_grupoMedio bajo -0.17<br />
-merito_soc:cod_grupoMedio -0.33<br />
-merito_soc:cod_grupoMedio alto -0.35<br />
-merito_soc:cod_grupoAlto -0.31<br />
-inteligencia_soc:cod_grupoMedio bajo -0.08<br />
-inteligencia_soc:cod_grupoMedio -0.17<br />
-inteligencia_soc:cod_grupoMedio alto -0.31<br />
-inteligencia_soc:cod_grupoAlto -0.05<br />
-esfuerzo_esc:cod_grupoMedio bajo -0.01<br />
-esfuerzo_esc:cod_grupoMedio -0.07<br />
-esfuerzo_esc:cod_grupoMedio alto 0.02<br />
-esfuerzo_esc:cod_grupoAlto -0.22<br />
-inteligencia_esc:cod_grupoMedio bajo 0.05
-inteligencia_esc:cod_grupoMedio -0.02 inteligencia_esc:cod_grupoMedio
-alto 0.02 inteligencia_esc:cod_grupoAlto -0.09
-————————————————————————————– Log Likelihood -7945.02 -7943.72 -7945.47
--7949.91 -7950.25 AIC 15976.04 15973.44 15976.94 15985.81 15986.50 BIC
-16270.34 16267.74 16271.23 16280.11 16280.80 Num. obs. 6933 6933 6933
-6933 6933<br />
-Groups (mrbd) 241 241 241 241 241<br />
-Variance: mrbd: (Intercept) 0.01 0.02 0.02 0.01 0.02 Variance: mrbd:
-cod_grupoMedio bajo 0.02 0.02 0.03 0.02 0.02 Variance: mrbd:
-cod_grupoMedio 0.06 0.07 0.07 0.06 0.07 Variance: mrbd: cod_grupoMedio
-alto 0.09 0.09 0.10 0.10 0.10 Variance: mrbd: cod_grupoAlto 0.03 0.04
-0.04 0.03 0.04
-======================================================================================
-*** p &lt; 0.001; ** p &lt; 0.01; * p &lt; 0.05</p>
-<p><em>meritocracia x simce</em></p>
-<pre class="r"><code>reg25_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce*esfuerzo_soc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
-<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
-##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg26_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce*merito_soc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
-<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
-##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg27_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce*inteligencia_soc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
-<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
-##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg28_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce*esfuerzo_esc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
-<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
-##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
-<pre class="r"><code>reg29_redis &lt;- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + cod_depe2 + cod_grupo + simce*inteligencia_esc + internet_rec + (1 + simce | mrbd), data=data_redis)</code></pre>
-<pre><code>## Warning: Using formula(x) is deprecated when x is a character vector of length &gt; 1.
-##   Consider formula(paste(x, collapse = &quot; &quot;)) instead.</code></pre>
+<table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;">
+<caption>
+Statistical models
+</caption>
+<thead>
+<tr>
+<th style="padding-left: 5px;padding-right: 5px;">
+ 
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 1
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 2
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 3
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 4
+</th>
+<th style="padding-left: 5px;padding-right: 5px;">
+Model 5
+</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top: 1px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.13<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.06)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.35
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.22
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.39<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.37
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.04)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.06)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.08<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.03)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recEd Media
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.14
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recEd Tecnica
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.29
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recUniversidad o posgrado
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.25
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.26<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.25
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.26<sup>*</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.26
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.12)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+educacion_recNs/Nr
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.16
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.16
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.17
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.10)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+libros_recMás de 25
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.21
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.05)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+acc_tec
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.01)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+mean_educ
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.55
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.57
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.55
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.54
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.52
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.45)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.45)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_depe2Part. subvencionado
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.03
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.06)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.06)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_depe2Part. privado
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.12
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.12
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.26)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.26)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoMedio bajo
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.08)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.07
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.11)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoMedio alto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.48
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.48<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.47
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.47<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.46
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.15)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.15)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+cod_grupoAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.15
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.16
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.16
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.17
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.17
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.26)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.26)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+simceMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.61
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.65<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.55
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.43
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.31
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.20)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.32)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+simceAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.00
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.14<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.84
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.25
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.41
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.21)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.35)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+internet_rec2
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+internet_recNs/Nr
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc:simceMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.18
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_soc:simceAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.26
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+1|2
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.02
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.10
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.34
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.34
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.28)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+2|3
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.06
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+1.14<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.97
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.74<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.73
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.28)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+3|4
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.77
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.86<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.69
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.45<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+2.45
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.24)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.28)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc:simceMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.20<sup>**</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+merito_soc:simceAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.32<sup>***</sup>
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.07)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc:simceMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.15
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_soc:simceAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.20
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc:simceMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.09
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+esfuerzo_esc:simceAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.01
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+(0.09)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc:simceMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.06
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+inteligencia_esc:simceAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+ 
+</td>
+</tr>
+<tr style="border-top: 1px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+Log Likelihood
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7941.19
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7937.73
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7943.87
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7947.43
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+-7947.72
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+AIC
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15948.39
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15941.45
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15953.74
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15960.85
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+15961.44
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+BIC
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16174.24
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16167.30
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16179.59
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16186.71
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+16187.29
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Num. obs.
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+6933
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Groups (mrbd)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+241
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: (Intercept)
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.00
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.00
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.00
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.00
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: simceMedio
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.01
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.00
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.01
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.01
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.01
+</td>
+</tr>
+<tr style="border-bottom: 2px solid #000000;">
+<td style="padding-left: 5px;padding-right: 5px;">
+Variance: mrbd: simceAlto
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.11
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10
+</td>
+<td style="padding-left: 5px;padding-right: 5px;">
+0.10
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="font-size: 0.8em;" colspan="6">
+<sup>***</sup>p &lt; 0.001; <sup>**</sup>p &lt; 0.01; <sup>*</sup>p &lt;
+0.05
+</td>
+</tr>
+</tfoot>
+</table>
 </div>
 </div>
 </div>
