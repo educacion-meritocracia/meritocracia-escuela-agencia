@@ -272,3 +272,7 @@ plot1 <- plot_model(reg10.1_bienestar, title = "", show.values = TRUE, value.off
 ggsave(plot1, file="output/graphs/plot1.png")
 ```
 
+```{r}
+easystats::model_dashboard(reg5_bienestar, output_file = "dashboard_bienestar.html", output_dir = "output/tables")
+```
+

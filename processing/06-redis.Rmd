@@ -260,3 +260,6 @@ plot2 <- plot_model(reg10.1_redis, title = "", show.values = TRUE, value.offset 
 ggsave(plot2, file="output/graphs/plot2.png")
 ```
 
+```{r}
+easystats::model_dashboard(reg5_redis, output_file = "dashboard_redistribution.html", output_dir = "output/tables")
+```
