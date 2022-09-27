@@ -33,7 +33,7 @@ Juan Carlos Castillo, Mauricio Salgado & Kevin Carrasco
 
 **FONDECYT N°1210847 Meritocracia en la escuela**
 
-.small[Martes 30 de agosto de 2022]
+.small[Martes 27 de septiembre de 2022]
 
 ---
 
@@ -150,6 +150,18 @@ En la escuela
 .center.small[Disminución de Brechas]
 
 .center[![:scale 80%](images/plot2.png)]
+
+---
+
+.center.small[Interacciones: Educación de los padres y Mérito]
+
+.center[![:scale 80%](images/int1.png)]
+
+---
+
+.center.small[Interacciones: Logro simce y Mérito]
+
+.center[![:scale 80%](images/int2.png)]
 
 ---
 
