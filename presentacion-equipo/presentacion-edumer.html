@@ -5,30 +5,80 @@
     <meta charset="utf-8" />
     <meta name="author" content="Juan Carlos Castillo, Mauricio Salgado &amp; Kevin Carrasco" />
     <script src="presentacion-edumer_files/header-attrs-2.13/header-attrs.js"></script>
-    <link rel="stylesheet" href="xaringan-kevin.css" type="text/css" />
+    <script src="presentacion-edumer_files/xaringanExtra-progressBar-0.0.1/progress-bar.js"></script>
+    <link rel="stylesheet" href="custom_2020.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 
 
-class: title-slide, middle, center
+class: middle hide-logo title
 
-background-image: url(images/edumer.png), url(images/logocoes.png)
-background-position: bottom left, bottom right
-background-size: 25%, 25%
+<style>.xe__progress-bar__container {
+  top:0;
+  opacity: 1;
+  position:absolute;
+  right:0;
+  left: 0;
+}
+.xe__progress-bar {
+  height: 0.25em;
+  background-color: red;
+  width: calc(var(--slide-current) / var(--slide-total) * 100%);
+}
+.remark-visible .xe__progress-bar {
+  animation: xe__progress-bar__wipe 200ms forwards;
+  animation-timing-function: cubic-bezier(.86,0,.07,1);
+}
+@keyframes xe__progress-bar__wipe {
+  0% { width: calc(var(--slide-previous) / var(--slide-total) * 100%); }
+  100% { width: calc(var(--slide-current) / var(--slide-total) * 100%); }
+}</style>
+
+.pull-left-narrow[
+.espaciosimple[
+.tiny[]
+]
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+
+![:scale 90%](images/edumer.png)
+&lt;br&gt;
+
+]
 
 
-# Meritocracia, preferencias redistributivas y socialización política escolar
 
+.pull-right-wide[
+.right[
+
+.content-box-gray[
+## Meritocracia, preferencias redistributivas y socialización política escolar
 ### **Resultados preliminares**
+]
 
+----
+.espaciosimplelineas[
+.medium[
 Juan Carlos Castillo, Mauricio Salgado &amp; Kevin Carrasco
 
 **FONDECYT N°1210847 Meritocracia en la escuela**
 
-.small[Martes 27 de septiembre de 2022]
+] 
+]
+
+
+
+
+
+.small[Martes 04 de octubre de 2022]
+
+]
+]
 
 ---
+class: inverse
 
 ## Estructura de la presentación
 
@@ -79,11 +129,13 @@ Juan Carlos Castillo, Mauricio Salgado &amp; Kevin Carrasco
 .center[https://doi.org/10.17605/OSF.IO/UFSDV]
 
 ---
+.espaciosimplelineas[
+.medium[
 ## Variables dependientes
 
 ### **Preferencias redistributivas**
 
-Índice de Acceso a bienestar social:
+Índice de Acceso a servicios sociales:
 
 * Es justo que en Chile las personas con mayores ingresos puedan tener mejores pensiones que las personas de ingresos más bajos.
 
@@ -91,13 +143,23 @@ Juan Carlos Castillo, Mauricio Salgado &amp; Kevin Carrasco
 
 * Es justo que en Chile las personas con mayores ingresos puedan acceder a una mejor atención de salud que las personas con ingresos más bajos.
 
---
+]
+]
+---
+.espaciosimplelineas[
+.medium[
+## Variables dependientes
+
+### **Preferencias redistributivas**
 
 Apoyo a políticas públicas de redistribución
 
 * El Gobierno de Chile debería hacer algo para reducir las diferencias de ingreso entre ricos y pobres
-
+]
+]
 ---
+.espaciosimplelineas[
+.medium[
 
 ## Variables independientes
 
@@ -112,8 +174,11 @@ En la sociedad
 
 * En Chile, las personas son recompensadas por su inteligencia y habilidad.
 ]
-
+]
+]
 --
+.espaciosimplelineas[
+.medium[
 .pull-right[
 En la escuela
 
@@ -122,7 +187,8 @@ En la escuela
 * El esfuerzo es importante para obtener buenas notas.
 ]
 
-
+]
+]
 
 ---
 ## Modelo teórico
@@ -134,46 +200,74 @@ En la escuela
 # Primeros resultados
 
 ---
-.center.small[Índice acceso a bienestar social]
 
-.center[![:scale 80%](images/plot1.png)]
+.center.small[**Índice acceso a servicios sociales**]
+
+.center[![:scale 50%](images/plot1.png)]
 
 
 ---
-.center.small[Disminución de Brechas]
 
-.center[![:scale 80%](images/plot2.png)]
+.center.small[**Apoyo a políticas públicas de redistribución**]
 
----
 
-.center.small[Interacciones: Educación de los padres y Mérito]
-
-.center[![:scale 80%](images/int1.png)]
+.center[![:scale 50%](images/plot2.png)]
 
 ---
 
-.center.small[Interacciones: Logro simce y Mérito]
+.pull-left[
+.center[
+.tiny[Educación de los padres y Mérito]
+]
 
-.center[![:scale 80%](images/int2.png)]
-
+.center[![:scale 100%](images/int1.png)]
+]
+--
+.pull-right[
+.center[
+.tiny[Logro simce y Mérito]
+]
+.center[![:scale 100%](images/int2.png)]
+]
 ---
 
-class: middle, center
+.pull-left-narrow[
+.espaciosimple[
+.tiny[]
+]
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
 
-background-image: url(images/edumer.png), url(images/logocoes.png)
-background-position: bottom left, bottom right
-background-size: 25%, 25%
+![:scale 90%](images/edumer.png)
+&lt;br&gt;
+
+]
 
 
-# Meritocracia, preferencias redistributivas y socialización política escolar
 
+.pull-right-wide[
+.right[
+
+.content-box-gray[
+## Meritocracia, preferencias redistributivas y socialización política escolar
 ### **Resultados preliminares**
+]
 
+----
+.espaciosimplelineas[
+.medium[
 Juan Carlos Castillo, Mauricio Salgado &amp; Kevin Carrasco
 
 **FONDECYT N°1210847 Meritocracia en la escuela**
 
-.small[Martes 30 de agosto de 2022]
+] 
+]
+
+.small[Martes 04 de octubre de 2022]
+
+]
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -181,7 +275,8 @@ Juan Carlos Castillo, Mauricio Salgado &amp; Kevin Carrasco
 <script>var slideshow = remark.create({
 "highlightStyle": "solarized-dark",
 "highlightLines": true,
-"countIncrementalSlides": false
+"countIncrementalSlides": false,
+"ratio": "16:9"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
