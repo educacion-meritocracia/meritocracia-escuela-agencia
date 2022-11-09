@@ -267,8 +267,8 @@ labels <- c("Esfuerzo social",
                               "NS/NR"
                               )
 labels2 <- rev(labels)
-plot1 <- plot_model(reg10.1_bienestar, title = "", show.values = TRUE, value.offset = .4, axis.labels = labels2)
-
+plot1 <- plot_model(reg5_bienestar, title = "", show.values = TRUE, value.offset = .4, axis.labels = labels2)
+plot1
 ggsave(plot1, file="output/graphs/plot1.png")
 ```
 

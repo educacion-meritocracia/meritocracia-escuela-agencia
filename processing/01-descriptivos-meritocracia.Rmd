@@ -13,7 +13,7 @@ output:
 ---
 
 ```{r}
-pacman::p_load(haven, dplyr, summarytools, sjmisc, car, sjlabelled, webshot)
+pacman::p_load(haven, dplyr, summarytools, sjmisc, car, sjlabelled, webshot, sjPlot, ggplot2)
 load("input/data/proc/alumnos_patterns.RData")
 load("input/data/proc/apoderados_patterns.RData")
 ```
@@ -141,20 +141,18 @@ dependientes$bienestar <- round(dependientes$bienestar, 2)
 dependientes <- dependientes %>% dplyr::select(-pension_rec, -educ_rec, -salud_rec)
 
 dependientes$just_pension <- factor(dependientes$just_pension, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
-dependientes$just_pension <- set_label(dependientes$just_pension, label = "It is fair that in Chile people with higher incomes can have better pensions than people with low incomes")
+dependientes$just_pension <- set_label(dependientes$just_pension, label = "It is just that in Chile people with higher incomes can have better pensions than people with low incomes")
 
 dependientes$just_salud <- factor(dependientes$just_salud, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
-dependientes$just_salud <- set_label(dependientes$just_salud,label = "It is fair that in Chile people with higher incomes can access better health services than people with low incomes")
+dependientes$just_salud <- set_label(dependientes$just_salud,label = "It is just that in Chile people with higher incomes can access better health services than people with low incomes")
 
 dependientes$just_educ <- factor(dependientes$just_educ, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
-dependientes$just_educ <- set_label(dependientes$just_educ,label = "It is fair that in Chile people who can pay have a better education for their children")
+dependientes$just_educ <- set_label(dependientes$just_educ,label = "It is just that in Chile people who can pay have a better education for their children")
 
-dependientes$bienestar <- set_label(dependientes$bienestar,label = "index of access to social welfare")
+dependientes$bienestar <- set_label(dependientes$bienestar,label = "Index of access to social services")
 
 dependientes$redistribucion <- factor(dependientes$redistribucion, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
-dependientes$redistribucion <- set_label(dependientes$redistribucion,label = "The Chilean government should do something to reduce the income gap between rich and poor")
-
-# Pendiente modificar categoríass de respuestas y las demás variables indep (traducir a inglés)
+dependientes$redistribucion <- set_label(dependientes$redistribucion,label = "The Chilean government should do something to reduce the income gap between the rich and the poor.")
 
 df<- dfSummary(dependientes,
                plain.ascii = FALSE,
@@ -238,3 +236,23 @@ view(df3,file = "output/tables/desc03.html")
 webshot(url ="output/tables/desc03.html" ,file ="output/tables/desc03.png")
 ```
 
+# graficos descriptivos
+
+## dependientes
+```{r}
+dependientes <- sjPlot::plot_stackfrq(select(data, just_educ, just_pension, just_salud, redistribucion), geom.size = 0.4) +
+  theme_bw() +
+  theme(legend.position="bottom")
+
+ggsave(dependientes, file = "output/graphs/dependientes.png",device = "png",width = 25,height = 13,dpi = "retina",units = "cm")
+```
+
+## independientes
+
+```{r}
+independientes <- sjPlot::plot_stackfrq(select(data, inteligencia_esc, esfuerzo_esc, inteligencia_soc, merito_soc, esfuerzo_soc)) +
+  theme_bw() +
+  theme(legend.position="bottom")
+
+ggsave(independientes, file = "output/graphs/independientes.png",device = "png",width = 25,height = 13,dpi = "retina",units = "cm")
+```
