@@ -1,0 +1,468 @@
+---
+title: "Meritocracia, preferencias redistributivas y socialización política escolar"
+subtitle: ".medium[**Resultados preliminares**]"
+author: "Juan Carlos Castillo, Mauricio Salgado & Kevin Carrasco"
+institute: ".small[**FONDECYT N°1210847 Meritocracia en la escuela**]"
+output:
+  xaringan::moon_reader:
+    css: ["custom_lisa.css"]
+    seal: false
+    nature:
+      highlightStyle: solarized-dark
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "xaringan_custom/macros.js"
+      ratio: '16:9'
+---
+
+class: middle title-slide
+
+```{r xaringanExtra, echo = FALSE}
+  xaringanExtra::use_progress_bar(color = "red", location = c("top"))
+```
+
+.pull-left-narrow[
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+![:scale 70%](images/edumer.png)
+.small[.red[FONDECYT N°1210847 Meritocracia en la Escuela]
+]
+]
+
+
+.pull-right-wide[
+.right[
+
+.content-box-red[
+## Meritocracia, preferencias redistributivas y socialización política escolar
+
+]
+
+----
+<br>
+.espaciosimplelineas[
+.medium[
+Juan Carlos Castillo, Mauricio Salgado & Kevin Carrasco
+] 
+]
+
+
+.small[22 de Noviembre 2022]
+]
+]
+
+---
+
+layout: true
+class: animated, fadeIn
+
+
+---
+class: middle
+
+.pull-left-narrow[
+# **PRICE**:
+### Programa de Investigación en Ciudadanía Escolar
+]
+
+.pull-right-wide[
+![](images/price.png)
+
+.right[
+[ciudadania-escolar.cl/](https://ciudadania-escolar.cl)
+]]
+
+
+---
+class: middle
+
+.pull-left-narrow[
+# **PRICE**:
+### Programa de Investigación en Ciudadanía Escolar
+]
+
+.pull-right-wide[
+
+![](images/proyectos.png)
+
+.right[
+Proyectos desde 2011 ]
+]
+
+
+---
+.pull-left-narrow[
+# **PRICE**:
+### Programa de Investigación en Ciudadanía Escolar
+]
+
+.pull-right-wide[
+
+![](images/equipo.png)
+]
+
+---
+class: inverse animated slideInRight
+
+## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+]
+
+.pull-right[
+.large[
+1. Introdución
+2. Hipótesis
+3. Metodología
+4. Resultados
+5. Discusión
+]
+]
+
+---
+class: inverse 
+
+## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+]
+
+.pull-right[
+.large[
+1. .yellow[Introdución]
+2. Hipótesis
+3. Metodología
+4. Resultados
+5. Discusión
+]
+]
+
+
+
+
+---
+# .black[Introducción]
+
+.pull-left[
+.content-box-gray[
+## Preferencias redistributivas
+
+  - Interés racional (homo economicus)
+  
+  - Factores culturales
+  ]
+  ]
+  
+--
+.pull-right[
+<br>
+.content-box-green[
+## Meritocracia
+
+  - Esfuerzo y talento
+  
+  - Elementos normativos
+  
+  - Elementos perceptuales
+]
+]
+---
+class:inverse middle center
+
+## .yellow[¿En qué medida la percepción de meritocracia en la etapa escolar se asocia a preferencias redistributivas?
+]
+
+---
+# .black[Introducción]
+
+----
+
+.pull-left[
+.content-box-purple[
+## Familia
+
+  - Estatus socioeconómico
+  
+  - Capital cultural
+
+<br>
+
+  ]
+  ]
+
+.pull-right[
+.content-box-yellow[
+## Escuela
+
+- Percepción de meritocracia (escuela y sociedad)
+
+- Orientación al logro
+
+<br>
+
+]
+
+]
+
+---
+class: inverse animated slideInRight
+
+## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+]
+
+.pull-right[
+.large[
+1. Introdución
+2. .yellow[Hipótesis]
+3. Metodología
+4. Resultados
+5. Discusión
+]
+]
+
+---
+## Hipótesis
+
+.center[![:scale 80%](images/modelo-teorico.jpg)]
+
+.small[
+* Preregistro: [https://doi.org/10.17605/OSF.IO/UFSDV](https://doi.org/10.17605/OSF.IO/UFSDV)
+]
+---
+class: inverse animated slideInRight
+
+## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+]
+
+.pull-right[
+.large[
+1. Introdución
+2. Hipótesis
+3. .yellow[Metodología]
+4. Resultados
+5. Discusión
+]
+]
+
+---
+## Datos
+----
+
+.pull-left[
+* Primer estudio nacional de Formación Ciudadana 2017
+
+* Realizado por la Agencia de Calidad de Educación
+
+* Estudiantes y apoderados
+
+
+]
+
+.pull-right[
+.right[![:scale 200%](images/estudio-agencia.jpg)
+]
+]
+
+---
+.espaciosimplelineas[
+.medium[
+## Variables dependientes
+
+.center[![:scale 90%](graphs/dependientes.png)]
+]
+]
+---
+.espaciosimplelineas[
+.medium[
+
+## Variables independientes
+
+.center[![:scale 90%](graphs/independientes.png)]
+]
+]
+
+---
+
+## Variables independientes
+----
+.pull-left[
+.content-box-purple[
+### Familia
+
+* Nivel educacional de los apoderados
+
+* Cantidad de libros en el hogar
+
+* Acceso a tecnología
+
+]
+]
+
+.pull-right[
+.content-box-yellow[
+### Escuela
+
+* Proporción de apoderados con educación universitaria
+
+* Dependencia adm.
+
+* NSE
+
+* Logro en prueba SIMCE
+
+]
+]
+
+---
+class: inverse animated slideInRight
+
+## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+]
+
+.pull-right[
+.large[
+1. Introdución
+2. Hipótesis
+3. Metodología
+4. .yellow[Resultados]
+5. Discusión
+]
+]
+---
+
+.pull-left-narrow[
+<br>
+### Apoyo a políticas públicas de redistribución]
+
+
+.pull-right-wide[
+.center[![:scale 85%](images/plot2.png)]
+]
+---
+
+.pull-left-narrow[
+<br>
+### Índice acceso a servicios sociales
+]
+
+
+.pull-right-wide[
+
+.center[![:scale 85%](images/plot1.png)]
+]
+---
+
+.pull-left-narrow[
+<br>
+### Índice acceso a servicios sociales: Interacciones
+]
+
+.pull-right-wide[
+.center[![:scale 85%](graphs/int2.3.png)]
+]
+---
+class: inverse animated slideInRight
+
+## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+]
+
+.pull-right[
+.large[
+1. Introdución
+2. Hipótesis
+3. Metodología
+4. Resultados
+5. .yellow[Discusión]
+]
+]
+
+---
+# Discusión
+
+- la percepción de una sociedad meritocrática está relacionada con la justificación de que quienes tienen más recursos también tengan más beneficios
+
+- percepción de la meritocracia en la escuela: efectos mixtos
+
+- los estudiantes que asisten a escuelas con mejores puntajes de rendimiento en promedio prefieren un acceso más universal a los servicios sociales y más redistribución
+- escuelas con alto SIMCE también mitigan el efecto negativo de meritocracia en preferencias redistributivas
+
+---
+### Resumen comparativo
+
+.center[
+Original
+
+![:scale 50%](images/hip-original.jpg)
+]
+
+---
+### Resumen comparativo
+
+.pull-left[
+Access to social services
+![:scale 100%](images/hip-services.jpg)
+]
+
+.pull-right[
+Redistribution
+![:scale 100%](images/hip-redis.jpg)
+]
+
+---
+class: roja middle
+
+# ¡Muchas gracias!
+
+.right[
+.yellow[Más información en: 
+
+[www.ciudadania-escolar.cl](https://ciudadania-escolar.cl/)
+]]
+
+
+
+
+---
+class: middle title-slide
+
+
+.pull-left-narrow[
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+![:scale 70%](images/edumer.png)
+.small[.red[FONDECYT N°1210847 Meritocracia en la Escuela]
+]
+]
+
+
+.pull-right-wide[
+.right[
+
+.content-box-red[
+## Meritocracia, preferencias redistributivas y socialización política escolar
+
+]
+
+----
+<br>
+.espaciosimplelineas[
+.medium[
+Juan Carlos Castillo, Mauricio Salgado & Kevin Carrasco
+] 
+]
+
+
+.small[Conferencia COES - 10 de Noviembre 2022]
+]
+]
+
