@@ -147,8 +147,16 @@ data_redis <- na.omit(data_redis)
 data_redis$redistribucion_fact <- as_factor(data_redis$redistribucion)
 ```
 
+## Intraclass correlation
+
 ```{r}
 reg0_redis <- clmm(redistribucion_fact ~ 1 + (1 | mrbd), data=data_redis)
+performance::icc(reg0_redis)
+```
+
+## Regresiones
+
+```{r}
 reg1_redis <- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + (1 | mrbd), data=data_redis)
 reg2_redis <- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + (1 | mrbd), data=data_redis)
 reg3_redis <- clmm(redistribucion_fact ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + internet_rec + (1 | mrbd), data=data_redis)

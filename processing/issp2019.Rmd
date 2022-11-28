@@ -1,0 +1,46 @@
+---
+title: "ISSP2019"
+author: "Equipo EDUMER"
+date: "2022-11-28"
+output: html_document
+---
+
+
+```{r}
+pacman::p_load(dplyr, ggplot2, sjPlot, haven, sjlabelled)
+
+ISSP2019 <- read_sav("input/data/original/ISSP2019.sav")
+
+data <- ISSP2019 %>% filter(country==152)
+```
+
+```{r}
+table(data$v30)
+summary(data$v30)
+data$v30 <- factor(data$v30, labels = c("Very just, definitely right", "Somewhat just, right", "Neither just nor unjust, mixed feelings", "Somewhat unjust, wrong", "Very unjust, definitely wrong"))
+data$v30 <- set_label(data$v30, label = "Just or unjust that people with higher incomes can buy better health care than people with lower incomes?")
+
+table(data$v31)
+summary(data$v31)
+data$v31 <- factor(data$v31, labels = c("Very just, definitely right", "Somewhat just, right", "Neither just nor unjust, mixed feelings", "Somewhat unjust, wrong", "Very unjust, definitely wrong"))
+data$v31 <- set_label(data$v31, label = "Just or unjust that people with higher incomes can buy better education for children than people with lower incomes?")
+```
+
+```{r}
+issp2019 <- sjPlot::plot_stackfrq(select(data, v30, v31), geom.size = 0.4) +
+  theme_bw() +
+  theme(legend.position="bottom")
+issp2019
+
+ggsave(issp2019, file = "output/graphs/issp2019.png",device = "png",width = 25,height = 13,dpi = "retina",units = "cm")
+```
+
+```{r}
+issp2 <- sjPlot::plot_likert(select(data, v30, v31), geom.size = 0.4, cat.neutral = 3, geom.colors = "RdBu") +
+  theme_bw() +
+  theme(legend.position="bottom")
+issp2
+
+ggsave(issp2, file = "output/graphs/issp2019v2.png",device = "png",width = 25,height = 13,dpi = "retina",units = "cm")
+```
+

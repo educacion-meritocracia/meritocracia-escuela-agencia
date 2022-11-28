@@ -8,16 +8,16 @@ output: html_document
 ## indice variables acceso a bienestar social
 
 ```{r}
-pacman::p_load(haven, dplyr, summarytools, sjmisc, car, sjlabelled, sjPlot, lme4, stargazer, corrplot, ltm, texreg, ordinal, MASS, webshot, gtools, kableExtra)
+pacman::p_load(haven, dplyr, summarytools, sjmisc, car, sjlabelled, sjPlot, lme4, stargazer, corrplot, ltm, texreg, ordinal, MASS, webshot, gtools, kableExtra, ggplot2)
 load("input/data/proc/data_rec.RData")
 
-data_rec <- data_rec %>% rowwise() %>%  mutate(educacion_rec2 = case_when(educacion_rec=="Ed Basica"~"Baja educacion",
-                                                 educacion_rec=="Ed Media"~"Baja educacion",
-                                                 educacion_rec=="Ed Tecnica"~"Baja educacion",
-                                                 educacion_rec=="Universidad o posgrado"~"Universidad o posgrado",
-                                                 educacion_rec=="Ns/Nr"~"Ns/Nr"
+data_rec <- data_rec %>% rowwise() %>%  mutate(educacion_rec2 = case_when(educacion_rec=="Ed Basica"~"Low level",
+                                                 educacion_rec=="Ed Media"~"Low level",
+                                                 educacion_rec=="Ed Tecnica"~"Low level",
+                                                 educacion_rec=="Universidad o posgrado"~"University or Postgraduate",
+                                                 educacion_rec=="Ns/Nr"~"Missing"
                                                  ))
-data_rec$educacion_rec2 <- factor(data_rec$educacion_rec2, levels = c("Baja educacion", "Universidad o posgrado", "Ns/Nr"))
+data_rec$educacion_rec2 <- factor(data_rec$educacion_rec2, levels = c("Low level", "University or Postgraduate", "Missing"))
 
 
 data_rec <- data_rec %>% rowwise() %>%  mutate(cod_grupo2  = case_when(cod_grupo=="Bajo"~"Bajo",
@@ -26,6 +26,8 @@ data_rec <- data_rec %>% rowwise() %>%  mutate(cod_grupo2  = case_when(cod_grupo
                                                                        cod_grupo=="Medio alto"~"Alto",
                                                                        cod_grupo=="Alto"~"Alto"))
 data_rec$cod_grupo2 <- factor(data_rec$cod_grupo2, levels = c("Bajo", "Alto"))
+data_rec$simce <- factor(data_rec$simce, labels = c("Low", "Medium", "High"))
+
 
 data_bienestar <- na.omit(data_rec)
 data_bienestar <- data_bienestar %>% mutate(pension_rec = 5-just_pension,
@@ -518,7 +520,7 @@ collapse_rows <-
   data.frame(vars = c("University or Postgraduate", 
                       "Ed. Missing", 
                       "More than 25 books", 
-                      "SES high", 
+                      "School SES high", 
                       "Prop. university level",
                       "Simce Medium", 
                       "Simce High"),
@@ -652,7 +654,7 @@ collapse_rows.1 <-
   data.frame(vars = c("University or Postgraduate", 
                       "Ed. Missing", 
                       "More than 25 books",
-                      "SES high", 
+                      "School SES high", 
                       "Prop. university level",
                       "Simce Medium", 
                       "Simce High"),
@@ -689,17 +691,17 @@ kbl(collapse_cols,
     align = "lcccccccccc", booktabs = T,
     col.names =  c("Variable",
                    "Social effort", 
-                   "Social merit",
-                   "Social intelligence", 
+                   "Deservingness",
+                   "Social talent", 
                    "School effort", 
-                   "School intelligence",
+                   "School talent",
                    "Social effort", 
-                   "Social merit",
-                   "Social intelligence", 
+                   "Deservingness",
+                   "Social talent", 
                    "School effort", 
-                   "School intelligence")) %>%
+                   "School talent")) %>%
   add_header_above(c(" " = 1,
-                     "Social welfare index"=5, 
+                     "Access to social services"=5, 
                      "Redistribution"=5), 
                    bold = T)%>%  
   kable_styling(latex_options = c("scale_down","HOLD_position"),
@@ -712,6 +714,53 @@ kbl(collapse_cols,
   save_kable("output/tables/interactions2.png")
 ```
 
+# Grafico de interacciones
+
+```{r}
+int1 <- plot_model(reg11_bienestar, type = "int", mdrt.values="meansd", title = "") +
+  theme_bw() +
+  labs(x = "Parental educational level", y="Index of Access to social services", colour = "Deservingness")
+
+ggsave(int1, file="output/graphs/int1.png")
+```
+
+```{r}
+int2 <- plot_model(reg26_bienestar, type = "int", mdrt.values="meansd", title = "") +
+  theme_bw() +
+  labs(x = "School Simce", y="Index of Access to social services", colour = "Deservingness")
+
+ggsave(int2, file="output/graphs/int2.png")
+```
+
+#### Gráfico sin categoría missing (con código sale sin intervalos de confianza; se deja Missing en blanco para ocultar)
+```{r}
+reg11.2_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + merito_soc*educacion_rec2 + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo2 + simce + internet_rec + (1 + educacion_rec2 | mrbd), data=data_bienestar)
+#no se xq no funciona el de abajo
+int1.2 <- sjPlot::plot_model(reg11.2_bienestar, type = "int", title = "", colors = c("red", "blue", "white")) +
+  theme_bw() +
+  labs(x ="Deservingness" , y="Index of Access to social services", colour = "Parental educational level")
+int1.2
+ggsave(int1.2, file="output/graphs/int1.2.png")
+```
+
+```{r}
+reg26.2_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec2 + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo2 + merito_soc*simce + internet_rec + (1 + simce | mrbd), data=data_bienestar)
+```
+```{r}
+int2.2 <- plot_model(reg26.2_bienestar, type = "int", mdrt.values="minmax", title = "", colors = c("red", "white", "blue")) +
+  theme_bw() +
+  labs(x = "Deservingness", y="Index of Access to social services", colour = "School Simce")
+int2.2
+ggsave(int2.2, file="output/graphs/int2.2.png")
+```
+
+```{r}
+int2.3 <- plot_model(reg26.2_bienestar, type = "int", mdrt.values="minmax", title = "", colors = c("red", "white", "blue")) +
+  theme_bw() +
+  labs(x = "Mérito en la sociedad", y="Índice de acceso a servicios sociales", colour = "Logro Simce")
+int2.3
+ggsave(int2.3, file="output/graphs/int2.3.png")
+```
 
 
 

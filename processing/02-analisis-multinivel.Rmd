@@ -167,6 +167,15 @@ data_bienestar$bienestar <- round(data_bienestar$bienestar, 2)
 summary(data_bienestar$bienestar)
 ```
 
+## Intra class correlation
+
+```{r}
+reg0_bienestar <- lmer(bienestar ~ 1 + (1 | mrbd), data=data_bienestar)
+performance::icc(reg0_bienestar)
+```
+
+## Regresiones multinivel
+
 ```{r}
 reg1_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + (1 | mrbd), data=data_bienestar)
 reg2_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + (1 | mrbd), data=data_bienestar)
@@ -275,4 +284,73 @@ ggsave(plot1, file="output/graphs/plot1.png")
 ```{r}
 easystats::model_dashboard(reg5_bienestar, output_file = "dashboard_bienestar.html", output_dir = "output/tables")
 ```
+
+## Test deviance
+
+```{r}
+test01<- anova(reg0_bienestar,reg1_bienestar,test = "Chisq")
+test02<- anova(reg0_bienestar,reg2_bienestar,test = "Chisq")
+test03<- anova(reg0_bienestar,reg3_bienestar,test = "Chisq")
+test04<- anova(reg0_bienestar,reg4_bienestar,test = "Chisq")
+test05<- anova(reg0_bienestar,reg5_bienestar,test = "Chisq")
+
+lrt01<- rbind(test01,test02,test03,test04,test05) %>% unique()
+row.names(lrt01) <- c("Modelo nulo",
+                      "Modelo 1",
+                      "Modelo 2",
+                      "Modelo 3",
+                      "Modelo 4",
+                      "Modelo 5")
+knitr::kable(lrt01,digits = 3, caption = "Test de devianza entre modelos")
+
+test.pvalues1<- test01$`Pr(>Chi)`[2]
+test.pvalues2<- test02$`Pr(>Chi)`[2]
+test.pvalues3<- test03$`Pr(>Chi)`[2]
+test.pvalues4<- test04$`Pr(>Chi)`[2]
+test.pvalues5<- test05$`Pr(>Chi)`[2]
+```
+
+## R2
+
+```{r}
+varcomp_0=as.data.frame(lme4::VarCorr(reg0_bienestar))
+tau00_0=varcomp_0[1,4]
+sigma2_0=varcomp_0[2,4]
+
+varcomp_1=as.data.frame(lme4::VarCorr(reg1_bienestar))
+tau00_1=varcomp_1[1,4]
+sigma2_1=varcomp_1[2,4]
+
+varcomp_2=as.data.frame(lme4::VarCorr(reg2_bienestar))
+tau00_2=varcomp_2[1,4]
+sigma2_2=varcomp_2[2,4]
+
+varcomp_3=as.data.frame(lme4::VarCorr(reg3_bienestar))
+tau00_3=varcomp_3[1,4]
+sigma2_3=varcomp_3[2,4]
+
+varcomp_4=as.data.frame(lme4::VarCorr(reg4_bienestar))
+tau00_4=varcomp_4[1,4]
+sigma2_4=varcomp_4[2,4]
+
+varcomp_5=as.data.frame(lme4::VarCorr(reg5_bienestar))
+tau00_5=varcomp_5[1,4]
+sigma2_5=varcomp_5[2,4]
+
+# Modelo 1 (predictores individuales)
+
+R2_1_L1=(sigma2_0-sigma2_1)/sigma2_0
+R2_1_L1
+
+# Modelo 2 (predictores grupales)
+R2_2_L1=(sigma2_0-sigma2_2)/sigma2_0
+R2_2_L1
+R2_2_L1=(tau00_0-tau00_2)/tau00_0
+R2_2_L1
+
+# ICC (para comparación)
+ICC_0=tau00_0/(tau00_0+sigma2_0)
+ICC_0
+```
+
 
