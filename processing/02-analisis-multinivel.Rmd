@@ -13,7 +13,7 @@ output:
 ---
 
 ```{r}
-pacman::p_load(haven, dplyr, summarytools, sjmisc, car, sjlabelled, sjPlot, lme4, stargazer, corrplot, ltm, texreg, ordinal, MASS, webshot, ggplot2)
+pacman::p_load(haven, dplyr, summarytools, sjmisc, car, sjlabelled, sjPlot, lme4, stargazer, corrplot, ltm, texreg, ordinal, MASS, webshot, ggplot2, r2mlm)
 load("input/data/proc/alumnos_patterns.RData")
 load("input/data/proc/apoderados_patterns.RData")
 ```
@@ -145,9 +145,7 @@ save(data_rec, file = "input/data/proc/data_rec.RData")
 
 ```{r}
 data_bienestar <- na.omit(data_rec)
-data_bienestar <- data_bienestar %>% mutate(pension_rec = 5-just_pension,
-                                            educ_rec = 5-just_educ,
-                                            salud_rec = 5-just_salud)
+
 table(data_bienestar$just_pension)
 table(data_bienestar$pension_rec)
 
@@ -162,7 +160,7 @@ ltm::cronbach.alpha(data_bienestar  %>%
 ```
 
 ```{r}
-data_bienestar <- data_bienestar %>% rowwise() %>% dplyr::mutate(bienestar = mean(c(educ_rec, salud_rec, pension_rec)))
+data_bienestar <- data_bienestar %>% rowwise() %>% dplyr::mutate(bienestar = mean(c(just_pension, just_educ, just_salud), na.omit=TRUE))
 data_bienestar$bienestar <- round(data_bienestar$bienestar, 2)
 summary(data_bienestar$bienestar)
 ```
@@ -183,6 +181,31 @@ reg3_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_
 reg4_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + internet_rec + mean_educ + cod_depe2 + cod_grupo + (1 | mrbd), data=data_bienestar)
 reg5_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + internet_rec + mean_educ + cod_depe2 + cod_grupo + simce + (1 | mrbd), data=data_bienestar)
 ```
+
+### Test deviance
+
+```{r}
+test01<- anova(reg0_bienestar,reg1_bienestar,test = "Chisq")
+test02<- anova(reg0_bienestar,reg2_bienestar,test = "Chisq")
+test03<- anova(reg0_bienestar,reg3_bienestar,test = "Chisq")
+test04<- anova(reg0_bienestar,reg4_bienestar,test = "Chisq")
+test05<- anova(reg0_bienestar,reg5_bienestar,test = "Chisq")
+
+test.pvalues1<- test01$`Pr(>Chisq)`[2]
+test.pvalues2<- test02$`Pr(>Chisq)`[2]
+test.pvalues3<- test03$`Pr(>Chisq)`[2]
+test.pvalues4<- test04$`Pr(>Chisq)`[2]
+test.pvalues5<- test05$`Pr(>Chisq)`[2]
+
+deviance1 <- test01$deviance[2]
+deviance2 <- test02$deviance[2]
+deviance3 <- test03$deviance[2]
+deviance4 <- test04$deviance[2]
+deviance5 <- test05$deviance[2]
+
+```
+
+### Tabla de regresión
 
 ```{r results='asis'}
 htmlreg(list(reg1_bienestar, reg2_bienestar, reg3_bienestar, reg4_bienestar, reg5_bienestar),
@@ -212,17 +235,21 @@ htmlreg(list(reg1_bienestar, reg2_bienestar, reg3_bienestar, reg4_bienestar, reg
                               "SES Medio alto", 
                               "SES Alto", 
                               "Simce_Medio <i>(Ref. Bajo)</i>", 
-                              "Simce_alto"))
+                              "Simce_alto")
+                             )
 ```
 
 ```{r results='asis'}
+## ojo aquí, creo que para los p*** sin exportar en html se puede usar "$^{***}$ p < 0.001; $^{**}$ p < 0.01; $^{*}$ p < 0.05
+
 htmlreg(list(reg1_bienestar, reg2_bienestar, reg3_bienestar, reg4_bienestar, reg5_bienestar),
-        custom.model.names = c("Modelo 1",
-                               "Modelo 2",
-                               "Modelo 3",
-                               "Modelo 4",
-                               "Modelo 5"), 
-        custom.note = "$***p <$ 0.001, $**p <$ 0.01, $*p <$ 0.05", 
+        custom.model.names = c("Model 1",
+                               "Model 2",
+                               "Model 3",
+                               "Model 4",
+                               "Model 5"),
+        doctype = FALSE,
+        custom.note = "*** p < 0.001; ** p < 0.01; * p < 0.05", 
         omit.coef = "(internet_rec)",
         custom.coef.names = c("Intercept", 
                               "Social effort",
@@ -245,11 +272,21 @@ htmlreg(list(reg1_bienestar, reg2_bienestar, reg3_bienestar, reg4_bienestar, reg
                               "SES High", 
                               "Simce Medium <i>(Ref. Low)</i>", 
                               "Simce High"),
-        caption = "Access to Social services",
+        caption = "Justification of Inequality",
         caption.above = TRUE,
+        custom.gof.rows=list("Deviance" = c(deviance1,
+                                            deviance2,
+                                            deviance3,
+                                            deviance4,
+                                            deviance5),
+                             "Deviance Test (p)" = c(test.pvalues1,
+                                                       test.pvalues2,
+                                                       test.pvalues3,
+                                                       test.pvalues4,
+                                                       test.pvalues5)),
         file = "output/tables/reg_acceso.html")
 
-webshot(url ="output/tables/reg_acceso.html" ,file ="output/tables/reg_acceso.pdf")
+webshot2::webshot(url ="output/tables/reg_acceso.html" ,file ="output/tables/reg_acceso.png")
 ```
 
 ```{r}
@@ -285,72 +322,12 @@ ggsave(plot1, file="output/graphs/plot1.png")
 easystats::model_dashboard(reg5_bienestar, output_file = "dashboard_bienestar.html", output_dir = "output/tables")
 ```
 
-## Test deviance
 
-```{r}
-test01<- anova(reg0_bienestar,reg1_bienestar,test = "Chisq")
-test02<- anova(reg0_bienestar,reg2_bienestar,test = "Chisq")
-test03<- anova(reg0_bienestar,reg3_bienestar,test = "Chisq")
-test04<- anova(reg0_bienestar,reg4_bienestar,test = "Chisq")
-test05<- anova(reg0_bienestar,reg5_bienestar,test = "Chisq")
-
-lrt01<- rbind(test01,test02,test03,test04,test05) %>% unique()
-row.names(lrt01) <- c("Modelo nulo",
-                      "Modelo 1",
-                      "Modelo 2",
-                      "Modelo 3",
-                      "Modelo 4",
-                      "Modelo 5")
-knitr::kable(lrt01,digits = 3, caption = "Test de devianza entre modelos")
-
-test.pvalues1<- test01$`Pr(>Chi)`[2]
-test.pvalues2<- test02$`Pr(>Chi)`[2]
-test.pvalues3<- test03$`Pr(>Chi)`[2]
-test.pvalues4<- test04$`Pr(>Chi)`[2]
-test.pvalues5<- test05$`Pr(>Chi)`[2]
-```
 
 ## R2
 
 ```{r}
-varcomp_0=as.data.frame(lme4::VarCorr(reg0_bienestar))
-tau00_0=varcomp_0[1,4]
-sigma2_0=varcomp_0[2,4]
+mitml::multilevelR2(reg5_bienestar)
 
-varcomp_1=as.data.frame(lme4::VarCorr(reg1_bienestar))
-tau00_1=varcomp_1[1,4]
-sigma2_1=varcomp_1[2,4]
-
-varcomp_2=as.data.frame(lme4::VarCorr(reg2_bienestar))
-tau00_2=varcomp_2[1,4]
-sigma2_2=varcomp_2[2,4]
-
-varcomp_3=as.data.frame(lme4::VarCorr(reg3_bienestar))
-tau00_3=varcomp_3[1,4]
-sigma2_3=varcomp_3[2,4]
-
-varcomp_4=as.data.frame(lme4::VarCorr(reg4_bienestar))
-tau00_4=varcomp_4[1,4]
-sigma2_4=varcomp_4[2,4]
-
-varcomp_5=as.data.frame(lme4::VarCorr(reg5_bienestar))
-tau00_5=varcomp_5[1,4]
-sigma2_5=varcomp_5[2,4]
-
-# Modelo 1 (predictores individuales)
-
-R2_1_L1=(sigma2_0-sigma2_1)/sigma2_0
-R2_1_L1
-
-# Modelo 2 (predictores grupales)
-R2_2_L1=(sigma2_0-sigma2_2)/sigma2_0
-R2_2_L1
-R2_2_L1=(tau00_0-tau00_2)/tau00_0
-R2_2_L1
-
-# ICC (para comparación)
-ICC_0=tau00_0/(tau00_0+sigma2_0)
-ICC_0
 ```
-
 

@@ -123,20 +123,20 @@ data$acc_tec <- set_label(data$acc_tec,label = "Technology access index")
 
 # Dependientes
 ```{r}
-dependientes <- data %>% dplyr::select(just_pension, just_educ, just_salud, redistribucion)
+dependientes <- data %>% dplyr::select(just_pension, just_educ, just_salud)
 
 dependientes$pension_rec <- as.numeric(dependientes$just_pension)
 dependientes$educ_rec <- as.numeric(dependientes$just_salud)
 dependientes$salud_rec <- as.numeric(dependientes$just_educ)
-dependientes <- dependientes %>% dplyr::mutate(pension_rec = 5-pension_rec,
-                                            educ_rec = 5-educ_rec,
-                                            salud_rec = 5-salud_rec)
+#dependientes <- dependientes %>% dplyr::mutate(pension_rec = 5-pension_rec,
+#                                            educ_rec = 5-educ_rec,
+#                                            salud_rec = 5-salud_rec)
 
 ltm::cronbach.alpha(dependientes  %>%
   dplyr::select(educ_rec, salud_rec, pension_rec), na.rm=TRUE)
 
 
-dependientes <- dependientes %>% rowwise() %>% dplyr::mutate(bienestar = mean(c(educ_rec, salud_rec, pension_rec)))
+dependientes <- dependientes %>% rowwise() %>% dplyr::mutate(bienestar = mean(c(educ_rec, salud_rec, pension_rec), na.rm=TRUE))
 dependientes$bienestar <- round(dependientes$bienestar, 2)
 dependientes <- dependientes %>% dplyr::select(-pension_rec, -educ_rec, -salud_rec)
 
@@ -149,10 +149,10 @@ dependientes$just_salud <- set_label(dependientes$just_salud,label = "It is just
 dependientes$just_educ <- factor(dependientes$just_educ, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
 dependientes$just_educ <- set_label(dependientes$just_educ,label = "It is just that in Chile people who can pay have a better education for their children")
 
-dependientes$bienestar <- set_label(dependientes$bienestar,label = "Index of access to social services")
+dependientes$bienestar <- set_label(dependientes$bienestar,label = "Inequality justification index")
 
-dependientes$redistribucion <- factor(dependientes$redistribucion, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
-dependientes$redistribucion <- set_label(dependientes$redistribucion,label = "The Chilean government should do something to reduce the income gap between the rich and the poor.")
+#dependientes$redistribucion <- factor(dependientes$redistribucion, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
+#dependientes$redistribucion <- set_label(dependientes$redistribucion,label = "The Chilean government should do something to reduce the income gap between the rich and the poor.")
 
 df<- dfSummary(dependientes,
                plain.ascii = FALSE,
@@ -162,18 +162,18 @@ df<- dfSummary(dependientes,
                headings = F,  # encabezado
                varnumbers = F, # num variable
                labels.col = T, # etiquetas
-               na.col = F,    # missing
+               na.col = T,    # missing
                graph.col = T, # plot
                valid.col = T, # n valido
-               col.widths = c(1000,10,10,10,10))
+               col.widths = c(1000,10,10,10,10,10))
 df$Variable <- NULL # delete variable column
 view(df,file = "output/tables/desc01.html")
-webshot(url ="output/tables/desc01.html" ,file ="output/tables/desc01.png")
+webshot::webshot(url ="output/tables/desc01.html" ,file ="output/tables/desc01.png")
 ```
 
 # independientes
 ```{r}
-independientes <- data %>% select(inteligencia_esc, esfuerzo_esc, esfuerzo_soc, merito_soc, inteligencia_soc, educacion_rec, libros_rec, acc_tec)
+independientes <- data %>% dplyr::select(inteligencia_esc, esfuerzo_esc, esfuerzo_soc, merito_soc, inteligencia_soc, educacion_rec, libros_rec, acc_tec)
 
 independientes$inteligencia_esc <- factor(independientes$inteligencia_esc, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
 independientes$inteligencia_esc <- set_label(independientes$inteligencia_esc, label = "Intelligence is important to get good grades")
@@ -202,8 +202,9 @@ df2<- dfSummary(independientes,
                na.col = F,    # missing
                graph.col = T, # plot
                valid.col = T, # n valido
-               col.widths = c(1000,10,10,10,10))
-df2$Variable <- NULL # delete variable column
+               col.widths = c(20,1000,10,10,10,10))
+
+df2$Variable <- c("School talent", "School effort", "Social effort", "Deservingness", "Social talent", "Education", "Books", "Technology")
 view(df2,file = "output/tables/desc02.html")
 webshot(url ="output/tables/desc02.html" ,file ="output/tables/desc02.png")
 ```
@@ -211,7 +212,7 @@ webshot(url ="output/tables/desc02.html" ,file ="output/tables/desc02.png")
 # School
 
 ```{r}
-school <- data %>% select(mean_educ, simce, cod_depe2, cod_grupo)
+school <- data %>% dplyr::select(mean_educ, simce, cod_depe2, cod_grupo)
 
 school$cod_depe2  <- factor(school$cod_depe2, levels = c("Municipal", "Part. subvencionado", "Part. privado"), labels = c("Public", "Subsidized private", "Private"))
 school$cod_depe2 <- set_label(school$cod_depe2, label = "Administrative dependency of school")
@@ -230,8 +231,10 @@ df3<- dfSummary(school,
                na.col = F,    # missing
                graph.col = T, # plot
                valid.col = T, # n valido
-               col.widths = c(1000,10,10,10,10))
-df3$Variable <- NULL # delete variable column
+               col.widths = c(10,1000,10,10,10,10))
+df3$Variable <- c("Prop. university level
+at school",
+                  "Achievement", "Dependency", "Socioeconomic level")
 view(df3,file = "output/tables/desc03.html")
 webshot(url ="output/tables/desc03.html" ,file ="output/tables/desc03.png")
 ```

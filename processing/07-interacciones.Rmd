@@ -30,10 +30,10 @@ data_rec$simce <- factor(data_rec$simce, labels = c("Low", "Medium", "High"))
 
 
 data_bienestar <- na.omit(data_rec)
-data_bienestar <- data_bienestar %>% mutate(pension_rec = 5-just_pension,
-                                            educ_rec = 5-just_educ,
-                                            salud_rec = 5-just_salud)
-data_bienestar <- data_bienestar %>% rowwise() %>% dplyr::mutate(bienestar = mean(c(educ_rec, salud_rec, pension_rec)))
+#data_bienestar <- data_bienestar %>% mutate(pension_rec = 5-just_pension,
+#                                            educ_rec = 5-just_educ,
+#                                            salud_rec = 5-just_salud)
+data_bienestar <- data_bienestar %>% rowwise() %>% dplyr::mutate(bienestar = mean(c(just_educ, just_salud, just_pension), na.omit=TRUE))
 data_bienestar$bienestar <- round(data_bienestar$bienestar, 2)
 
 reg10.1_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec2 + libros_rec + acc_tec + mean_educ + cod_depe2 + cod_grupo2 + simce + internet_rec + (1 | mrbd), data=data_bienestar)
@@ -400,19 +400,19 @@ Se extraen coeficientes y pvalues de las interacciones
 ```{r}
 # educacion
 interact1 <- texreg::extract(reg10_bienestar)
-interact1_1 <- cbind(interact1@coef[19:20], interact1@pvalues[19:20])
+interact1_1 <- cbind(interact1@coef[19], interact1@pvalues[19])
 
 interact2 <- texreg::extract(reg11_bienestar)
-interact2_1 <- cbind(interact2@coef[19:20], interact2@pvalues[19:20])
+interact2_1 <- cbind(interact2@coef[19], interact2@pvalues[19])
 
 interact3 <- texreg::extract(reg12_bienestar)
-interact3_1 <- cbind(interact3@coef[19:20], interact3@pvalues[19:20])
+interact3_1 <- cbind(interact3@coef[19], interact3@pvalues[19])
 
 interact4 <- texreg::extract(reg13_bienestar)
-interact4_1 <- cbind(interact4@coef[19:20], interact4@pvalues[19:20])
+interact4_1 <- cbind(interact4@coef[19], interact4@pvalues[19])
 
 interact5 <- texreg::extract(reg14_bienestar)
-interact5_1 <- cbind(interact5@coef[19:20], interact5@pvalues[19:20])
+interact5_1 <- cbind(interact5@coef[19], interact5@pvalues[19])
 
 #libros
 interact6 <- texreg::extract(reg15_bienestar)
@@ -518,7 +518,6 @@ school_intel =
 
 collapse_rows <-
   data.frame(vars = c("University or Postgraduate", 
-                      "Ed. Missing", 
                       "More than 25 books", 
                       "School SES high", 
                       "Prop. university level",
@@ -531,7 +530,8 @@ collapse_rows <-
              school_intel) #espacio privado
 ```
 
-```{r}
+### Estas interacciones de redistribucion no se incluirán en la tabla final
+```{r, eval=FALSE}
 # educacion
 interact1.1 <- texreg::extract(reg10_redis)
 interact1.1_1 <- cbind(interact1.1@coef[18:19], interact1.1@pvalues[18:19])
@@ -613,7 +613,7 @@ interact25.1 <- texreg::extract(reg29_redis)
 interact25.1_1 <- cbind(interact25.1@coef[18:19], interact25.1@pvalues[18:19])
 ```
 
-```{r}
+```{r, eval=FALSE}
 soc_effort.1 = 
   c(paste0(round(interact1.1_1[,1],3), stars.pval(interact1.1_1[,2])),
     paste0(round(interact6.1_1[,1],3), stars.pval(interact6.1_1[,2])),
@@ -687,31 +687,25 @@ save(collapse_cols, file="input/data/proc/collapse_cols2.RData")
 
 
 ```{r}
-kbl(collapse_cols, 
-    align = "lcccccccccc", booktabs = T,
+kbl(collapse_rows,
+    align = "lccccc", booktabs = T,
     col.names =  c("Variable",
-                   "Social effort", 
-                   "Deservingness",
-                   "Social talent", 
-                   "School effort", 
-                   "School talent",
                    "Social effort", 
                    "Deservingness",
                    "Social talent", 
                    "School effort", 
                    "School talent")) %>%
   add_header_above(c(" " = 1,
-                     "Access to social services"=5, 
-                     "Redistribution"=5), 
+                     "Justification of Inequality"=5), 
                    bold = T)%>%  
   kable_styling(latex_options = c("scale_down","HOLD_position"),
                 full_width = F) %>%
-  column_spec(1, bold = T) %>%
-  column_spec(column = 2:11,width = "1.5cm") %>%
+  column_spec(1, bold = T, width = "4cm") %>%
+  column_spec(column = 2:6,width = "1.5cm") %>%
   collapse_rows(columns = 1:2, valign = "middle") %>% 
   footnote(general = "***p < 0.001, **p < 0.01, *p < 0.05",
            footnote_as_chunk = T,general_title = "Note: ") %>% 
-  save_kable("output/tables/interactions2.png")
+  save_kable("output/tables/interactions3.png")
 ```
 
 # Grafico de interacciones
@@ -719,7 +713,7 @@ kbl(collapse_cols,
 ```{r}
 int1 <- plot_model(reg11_bienestar, type = "int", mdrt.values="meansd", title = "") +
   theme_bw() +
-  labs(x = "Parental educational level", y="Index of Access to social services", colour = "Deservingness")
+  labs(x = "Parental educational level", y="Justification of Inequality", colour = "Deservingness")
 
 ggsave(int1, file="output/graphs/int1.png")
 ```
@@ -727,7 +721,7 @@ ggsave(int1, file="output/graphs/int1.png")
 ```{r}
 int2 <- plot_model(reg26_bienestar, type = "int", mdrt.values="meansd", title = "") +
   theme_bw() +
-  labs(x = "School Simce", y="Index of Access to social services", colour = "Deservingness")
+  labs(x = "School Simce", y="Justification of Inequality", colour = "Deservingness")
 
 ggsave(int2, file="output/graphs/int2.png")
 ```
@@ -738,7 +732,7 @@ reg11.2_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + inteligencia_soc + esfu
 #no se xq no funciona el de abajo
 int1.2 <- sjPlot::plot_model(reg11.2_bienestar, type = "int", title = "", colors = c("red", "blue", "white")) +
   theme_bw() +
-  labs(x ="Deservingness" , y="Index of Access to social services", colour = "Parental educational level")
+  labs(x ="Deservingness" , y="Justification of Inequality", colour = "Parental educational level")
 int1.2
 ggsave(int1.2, file="output/graphs/int1.2.png")
 ```
@@ -749,7 +743,7 @@ reg26.2_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + inteligencia_soc + esfu
 ```{r}
 int2.2 <- plot_model(reg26.2_bienestar, type = "int", mdrt.values="minmax", title = "", colors = c("red", "white", "blue")) +
   theme_bw() +
-  labs(x = "Deservingness", y="Index of Access to social services", colour = "School Simce")
+  labs(x = "Deservingness", y="Justification of Inequality", colour = "School Simce")
 int2.2
 ggsave(int2.2, file="output/graphs/int2.2.png")
 ```
