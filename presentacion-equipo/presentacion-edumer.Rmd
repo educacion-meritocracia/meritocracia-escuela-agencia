@@ -1,5 +1,5 @@
 ---
-title: "Meritocracia, preferencias redistributivas y socialización política escolar"
+title: "Socialización de la meritocracia en la escuela y la justificación de la desigualdad social"
 subtitle: ".medium[**Resultados preliminares**]"
 author: "Juan Carlos Castillo, Mauricio Salgado & Kevin Carrasco"
 institute: ".small[**FONDECYT N°1210847 Meritocracia en la escuela**]"
@@ -41,7 +41,7 @@ class: middle title-slide
 .right[
 
 .content-box-red[
-## Meritocracia, preferencias redistributivas y socialización política escolar
+## Socialización de la Meritocracia en la escuela y la justificación de la desigualdad social
 
 ]
 
@@ -54,7 +54,7 @@ Juan Carlos Castillo, Mauricio Salgado & Kevin Carrasco
 ]
 
 
-.small[22 de Noviembre 2022]
+.small[26 de enero 2023]
 ]
 ]
 
@@ -65,58 +65,15 @@ class: animated, fadeIn
 
 
 ---
-class: middle
 
-.pull-left-narrow[
-# **PRICE**:
-### Programa de Investigación en Ciudadanía Escolar
-]
-
-.pull-right-wide[
-![](images/price.png)
-
-.right[
-[ciudadania-escolar.cl/](https://ciudadania-escolar.cl)
-]]
-
-
----
-class: middle
-
-.pull-left-narrow[
-# **PRICE**:
-### Programa de Investigación en Ciudadanía Escolar
-]
-
-.pull-right-wide[
-
-![](images/proyectos.png)
-
-.right[
-Proyectos desde 2011 ]
-]
-
-
----
-.pull-left-narrow[
-# **PRICE**:
-### Programa de Investigación en Ciudadanía Escolar
-]
-
-.pull-right-wide[
-
-![](images/equipo.png)
-]
-
----
 class: inverse animated slideInRight
 
-## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+### .red[Socialización de la Meritocracia en la escuela y la justificación de la desigualdad social
 ]
 
 .pull-right[
 .large[
-1. Introdución
+1. Introducción
 2. Hipótesis
 3. Metodología
 4. Resultados
@@ -127,12 +84,12 @@ class: inverse animated slideInRight
 ---
 class: inverse 
 
-## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+### .red[Socialización de la Meritocracia en la escuela y la justificación de la desigualdad social
 ]
 
 .pull-right[
 .large[
-1. .yellow[Introdución]
+1. .yellow[Introducción]
 2. Hipótesis
 3. Metodología
 4. Resultados
@@ -148,7 +105,7 @@ class: inverse
 
 .pull-left[
 .content-box-gray[
-## Preferencias redistributivas
+## Justificación de la Desigualdad
 
   - Interés racional (homo economicus)
   
@@ -172,7 +129,7 @@ class: inverse
 ---
 class:inverse middle center
 
-## .yellow[¿En qué medida la percepción de meritocracia en la etapa escolar se asocia a preferencias redistributivas?
+## .yellow[¿En qué medida la percepción de meritocracia en la etapa escolar se asocia a la justificación de la desigualdad?
 ]
 
 ---
@@ -210,7 +167,7 @@ class:inverse middle center
 ---
 class: inverse animated slideInRight
 
-## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+### .red[Socialización de la Meritocracia en la escuela y la justificación de la desigualdad social
 ]
 
 .pull-right[
@@ -226,7 +183,7 @@ class: inverse animated slideInRight
 ---
 ## Hipótesis
 
-.center[![:scale 80%](images/modelo-teorico.jpg)]
+.center[![:scale 80%](images/modelo-teorico.png)]
 
 .small[
 * Preregistro: [https://doi.org/10.17605/OSF.IO/UFSDV](https://doi.org/10.17605/OSF.IO/UFSDV)
@@ -234,7 +191,7 @@ class: inverse animated slideInRight
 ---
 class: inverse animated slideInRight
 
-## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+### .red[Socialización de la Meritocracia en la escuela y la justificación de la desigualdad social
 ]
 
 .pull-right[
@@ -319,7 +276,7 @@ class: inverse animated slideInRight
 ---
 class: inverse animated slideInRight
 
-## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+### .red[Socialización de la Meritocracia en la escuela y la justificación de la desigualdad social
 ]
 
 .pull-right[
@@ -335,38 +292,38 @@ class: inverse animated slideInRight
 
 .pull-left-narrow[
 <br>
-### Apoyo a políticas públicas de redistribución]
-
+### Acceso desigual a salud, pensiones y educación según ingresos
+]
 
 .pull-right-wide[
-.center[![:scale 85%](images/plot2.png)]
+.center[![:scale 85%](graphs/plots2_esp.png)]
 ]
 ---
 
 .pull-left-narrow[
 <br>
-### Índice acceso a servicios sociales
+### Índice justificación de la desigualdad
 ]
 
 
 .pull-right-wide[
 
-.center[![:scale 85%](images/plot1.png)]
+.center[![:scale 85%](graphs/plot1.png)]
 ]
 ---
 
 .pull-left-narrow[
 <br>
-### Índice acceso a servicios sociales: Interacciones
+### Índice justificación de la desigualdad: Interacciones
 ]
 
 .pull-right-wide[
-.center[![:scale 85%](graphs/int2.3.png)]
+.center[![:scale 85%](graphs/int2.2_esp.png)]
 ]
 ---
 class: inverse animated slideInRight
 
-## .red[Meritocracia en la escuela, preferencias redistributivas, y socialización política escolar
+### .red[Socialización de la Meritocracia en la escuela y la justificación de la desigualdad social
 ]
 
 .pull-right[
@@ -386,30 +343,9 @@ class: inverse animated slideInRight
 
 - percepción de la meritocracia en la escuela: efectos mixtos
 
-- los estudiantes que asisten a escuelas con mejores puntajes de rendimiento en promedio prefieren un acceso más universal a los servicios sociales y más redistribución
-- escuelas con alto SIMCE también mitigan el efecto negativo de meritocracia en preferencias redistributivas
+- los estudiantes que asisten a escuelas con mejores puntajes de rendimiento en promedio justifican menos la desigualdad.
 
----
-### Resumen comparativo
-
-.center[
-Original
-
-![:scale 50%](images/hip-original.jpg)
-]
-
----
-### Resumen comparativo
-
-.pull-left[
-Access to social services
-![:scale 100%](images/hip-services.jpg)
-]
-
-.pull-right[
-Redistribution
-![:scale 100%](images/hip-redis.jpg)
-]
+- escuelas con alto SIMCE también mitigan el efecto positivo de meritocracia en la justificación de la desigualdad
 
 ---
 class: roja middle
@@ -449,7 +385,7 @@ class: middle title-slide
 .right[
 
 .content-box-red[
-## Meritocracia, preferencias redistributivas y socialización política escolar
+## Socialización de la Meritocracia en la escuela y la justificación de la desigualdad social
 
 ]
 
@@ -462,7 +398,7 @@ Juan Carlos Castillo, Mauricio Salgado & Kevin Carrasco
 ]
 
 
-.small[Conferencia COES - 10 de Noviembre 2022]
+.small[26 de Enero 2023]
 ]
 ]
 

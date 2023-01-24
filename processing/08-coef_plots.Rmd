@@ -218,3 +218,29 @@ plots2
 ggsave(plots2, file="output/graphs/plots2.png", width = 10, height = 7)
 ```
 
+#### Mismo plot pero en español para presentación
+```{r}
+plots2_esp<-plot_models(reg5_salud, reg5_pension, reg5_educ, 
+            rm.terms = c("1|2", "2|3", "3|4", "educacion_recEd Media", "educacion_recEd Tecnica", "educacion_recUniversidad o posgrado", "educacion_recNs/Nr", "libros_recMás de 25", "acc_tec", "internet_rec2", "internet_recNs/Nr", "mean_educ", "cod_depe2Part. subvencionado", "cod_depe2Part. privado", "cod_grupoMedio bajo", "cod_grupoMedio", "cod_grupoMedio alto", "cod_grupoAlto", "simceMedio", "simceAlto"), #quitar terminos
+            title = "", #quitar titulo
+            show.values = TRUE, #mostrar valor de efectos
+            dot.size = 1.3, #tamaño circulos
+            line.size = 1, #tamaño CI
+            value.size = 3.5, #tamaño valor efectoss
+            spacing = .7, #espacio entre efectos
+            grid = TRUE, # separa en un plot por modelo
+            vline.color = "red", # linea roja en punto neutro (1)
+            axis.labels = rev(c("Esfuerzo social", 
+                            "Merecimiento", 
+                            "Talento social", 
+                            "Esfuerzo escolar", 
+                            "Talento escolar")), #con rev porque automatico los tira en otro orden
+            show.legend = FALSE,
+            m.labels = c("Salud", "Pensiones", "Educación")) + # variables dependientes
+  theme_bw(base_size = 16)
+
+plots2_esp
+
+ggsave(plots2_esp, file="output/graphs/plots2_esp.png", width = 10, height = 7)
+```
+

@@ -243,10 +243,10 @@ webshot(url ="output/tables/desc03.html" ,file ="output/tables/desc03.png")
 
 ## dependientes
 ```{r}
-dependientes <- sjPlot::plot_stackfrq(select(data, just_educ, just_pension, just_salud, redistribucion), geom.size = 0.4) +
+dependientes <- sjPlot::plot_stackfrq(select(data, just_educ, just_pension, just_salud), geom.size = 0.4) +
   theme_bw() +
   theme(legend.position="bottom")
-
+dependientes
 ggsave(dependientes, file = "output/graphs/dependientes.png",device = "png",width = 25,height = 13,dpi = "retina",units = "cm")
 ```
 

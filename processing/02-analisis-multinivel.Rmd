@@ -300,6 +300,8 @@ labels <- c("Esfuerzo social",
                               "Ns/Nr", 
                               "Más de 25 libros", 
                               "Acceso a tecnología",
+                              "Internet",
+                              "NS/NR",
                               "Prop. universitarios escuela",
                               "Part. subv", 
                               "Part. priv", 
@@ -308,12 +310,14 @@ labels <- c("Esfuerzo social",
                               "SES Medio alto", 
                               "SES Alto", 
                               "Simce_Medio", 
-                              "Simce_alto",
-                              "Internet",
-                              "NS/NR"
+                              "Simce_alto"
                               )
 labels2 <- rev(labels)
-plot1 <- plot_model(reg5_bienestar, title = "", show.values = TRUE, value.offset = .4, axis.labels = labels2)
+plot1 <- plot_model(reg5_bienestar, 
+                    title = "",
+                    axis.labels = labels2,
+                    show.values = TRUE, 
+                    value.offset = .4)
 plot1
 ggsave(plot1, file="output/graphs/plot1.png")
 ```

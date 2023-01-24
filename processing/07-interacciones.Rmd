@@ -743,10 +743,23 @@ reg26.2_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + inteligencia_soc + esfu
 ```{r}
 int2.2 <- plot_model(reg26.2_bienestar, type = "int", mdrt.values="minmax", title = "", colors = c("red", "white", "blue")) +
   theme_bw() +
+  ylim(1,4)+
   labs(x = "Deservingness", y="Justification of Inequality", colour = "School Simce")
 int2.2
 ggsave(int2.2, file="output/graphs/int2.2.png")
 ```
+
+* Lo mismo en español
+```{r}
+int2.2_esp <- plot_model(reg26.2_bienestar, type = "int", mdrt.values="minmax", title = "", colors = c("red", "white", "blue")) +
+  theme_bw() +
+  ylim(1,4)+
+  labs(x = "Merecimiento", y="Justificación de la desigualdad", colour = "Simce escolar")
+  
+int2.2_esp
+ggsave(int2.2_esp, file="output/graphs/int2.2_esp.png")
+```
+
 
 ```{r}
 int2.3 <- plot_model(reg26.2_bienestar, type = "int", mdrt.values="minmax", title = "", colors = c("red", "white", "blue")) +
