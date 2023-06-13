@@ -225,7 +225,7 @@ reg5_educ <- clmm(just_educ_fact ~ 1 + esfuerzo_soc + inteligencia_soc + merito_
 
 # coef plot con modelo 2 (solo variables meritocracia)
 
-```{r}
+```{r eval=FALSE}
 plots <- plot_models(reg2_salud, reg2_pension, reg2_educ, 
             rm.terms = c("1|2", "2|3", "3|4"), #quitar terminos
             title = "", #quitar titulo
@@ -243,7 +243,7 @@ plots <- plot_models(reg2_salud, reg2_pension, reg2_educ,
 ggsave(plots, file="output/graphs/plots.png")
 ```
 
-```{r}
+```{r eval=FALSE}
 data_bienestar <- na.omit(data_rec)
 data_bienestar <- data_bienestar %>% rowwise() %>% dplyr::mutate(bienestar = mean(c(just_pension, just_educ, just_salud), na.omit=TRUE))
 data_bienestar$bienestar <- round(data_bienestar$bienestar, 2)
@@ -255,7 +255,7 @@ reg5_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_
 # coef plot modelo 5 (todas las variables)
 
 ```{r}
-plots2<-plot_models(reg5_bienestar, reg5_salud, reg5_educ, reg5_pension,  
+plots2<-plot_models(reg5_salud, reg5_educ, reg5_pension,  
             rm.terms = c("1|2", "2|3", "3|4", "educacion_recEd Media", "educacion_recEd Tecnica", "educacion_recUniversidad o posgrado", "educacion_recNs/Nr", "libros_recMás de 25", "acc_tec", "internet_rec2", "internet_recNs/Nr", "mean_educ", "cod_depe2Part. subvencionado", "cod_depe2Part. privado", "cod_grupoMedio bajo", "cod_grupoMedio", "cod_grupoMedio alto", "cod_grupoAlto"), #quitar terminos
             title = "", #quitar titulo
             show.values = TRUE, #mostrar valor de efectos
@@ -270,11 +270,11 @@ plots2<-plot_models(reg5_bienestar, reg5_salud, reg5_educ, reg5_pension,
                             "Deservingness",
                             "School effort", 
                             "School talent",
-                            "Simce medio",
-                            "Simce alto"
+                            "Simce score middle",
+                            "Simce score high"
                             )), #con rev porque automatico los tira en otro orden
             show.legend = FALSE,
-            m.labels = c("Index", "Health", "Education","Pensions")) + # variables dependientes
+            m.labels = c("Health", "Education","Pensions")) + # variables dependientes
   theme_bw(base_size = 16)
 
 plots2
