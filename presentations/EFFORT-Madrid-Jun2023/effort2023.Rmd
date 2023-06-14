@@ -28,19 +28,24 @@ xaringanExtra::use_tile_view()
 
 .pull-left-narrow[
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+
 
 ![:scale 70%](images/edumer.png)
 .small[.red[FONDECYT N°1210847 Meritocracia en la Escuela]
-]
-]
 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+.red[EFFORT Conference - Madrid, Universidad Carlos III]
+
+June 16th 2023
+]
+]
 
 .pull-right-wide[
 .right[
@@ -54,18 +59,18 @@ xaringanExtra::use_tile_view()
 
 
 <br>
-
 .medium[
 <div style="line-height:150%;">
-Juan Carlos Castillo, Mauricio Salgado,Kevin Carrasco, <br>
+Juan Carlos Castillo -  
+Dep. Sociology, Universidad de Chile
+<br> Mauricio Salgado, Kevin Carrasco, <br>
 Camila Moyano & Nicolás Angelcos
 </div>
 
-.red[EFFORT Conference - Madrid, Universidad Carlos III]
 ]
 
 
-.small[June 16th 2023]
+.small[]
 ]
 ]
 
