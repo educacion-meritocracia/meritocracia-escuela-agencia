@@ -33,12 +33,15 @@ xaringanExtra::use_tile_view()
 
 <br>
 <br>
-<br>
 
 
 ![:scale 70%](images/logocoes.png)
 
-June 27th 2023
+<div style="line-height:150%;">
+Conferencia DEMOSAL
+<br>Buenos Aires, 
+17 de Agosto 2023
+</div>
 ]]
 
 
@@ -56,17 +59,16 @@ June 27th 2023
 
 .medium[
 <div style="line-height:150%;">
-Juan Carlos Castillo* 
-<br> Mauricio Salgado, Kevin Carrasco, <br>
-Camila Moyano & Nicolás Angelcos
+Juan Carlos Castillo & Kevin Carrasco * 
+<br> Mauricio Salgado, Camila Moyano & Nicolás Angelcos<br>
 </div>
 ]
 <br>
 .small[
 <div style="line-height:150%;">
-*Departmento de Sociología, Universidad de Chile
+*Departmento de Sociología, Universidad de Chile - COES
 </div>
-[juancastillov@uchile.cl](juancastillov@uchile.cl) - [jc-castillo.com](https://jc-castillo.com)
+Contacto: [juancastillov@uchile.cl](juancastillov@uchile.cl) - [jc-castillo.com](https://jc-castillo.com)
 
 ]
 ]
@@ -394,7 +396,7 @@ class: middle title-slide
 
 ![:scale 70%](images/logocoes.png)
 
-June 27th 2023
+Agosto 17 2023
 ]]
 
 
@@ -423,6 +425,51 @@ Camila Moyano & Nicolás Angelcos
 *Departmento de Sociología, Universidad de Chile
 </div>
 [juancastillov@uchile.cl](juancastillov@uchile.cl) - [jc-castillo.com](https://jc-castillo.com)
+
+]
+]
+].pull-left-narrow[
+
+![:scale 70%](images/edumer.png)
+.small[.red[FONDECYT N°1210847 Meritocracia en la Escuela]
+
+<br>
+<br>
+
+
+![:scale 70%](images/logocoes.png)
+
+<div style="line-height:150%;">
+Conferencia DEMOSAL
+<br>Buenos Aires, 
+17 de Agosto 2023
+</div>
+]]
+
+
+.pull-right-wide[
+.right[
+
+.content-box-red[
+## Socialización de la meritocracia en la escuela y justificación de la desigualdad económica
+
+]
+
+----
+
+
+.medium[
+<div style="line-height:150%;">
+Juan Carlos Castillo & Kevin Carrasco* 
+<br> Mauricio Salgado, Camila Moyano & Nicolás Angelcos<br>
+</div>
+]
+<br>
+.small[
+<div style="line-height:150%;">
+*Departmento de Sociología, Universidad de Chile - COES
+</div>
+Contacto: [juancastillov@uchile.cl](juancastillov@uchile.cl) - [jc-castillo.com](https://jc-castillo.com)
 
 ]
 ]
