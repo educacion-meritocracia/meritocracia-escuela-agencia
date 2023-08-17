@@ -8,4 +8,4 @@
 
 - [The socialization of meritocracy at school and the justification of economic inequality - ISA Melbourne, June 2023](https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/presentations//ISA-Melbourne2023/ISA2023.html)
 
-- [La socialización de la meritocracia en la escuela y la justificación de la desigualdad económica - Demosal Buenos Aures, Agosto 2023](https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/presentations//demosal2023/demosal2023.html)
+- [La socialización de la meritocracia en la escuela y la justificación de la desigualdad económica - Demosal Buenos Aires, Agosto 2023](https://educacion-meritocracia.github.io/meritocracia-escuela-agencia/presentations//demosal2023/demosal2023.html)
