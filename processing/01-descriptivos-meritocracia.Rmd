@@ -2,18 +2,20 @@
 title: "descriptivos-meritocracia"
 author: "Equipo EDUMER"
 date: "29-11-2021"
-output: 
-  html_document: 
-    toc: yes
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
     code_folding: hide
-    toc_float: 
+    toc_float:
       collapsed: true
       smooth_scroll: false
       number_sections: true
 ---
 
 ```{r}
-pacman::p_load(haven, dplyr, summarytools, sjmisc, car, sjlabelled, webshot, sjPlot, ggplot2)
+pacman::p_load(haven, dplyr, summarytools, sjmisc, car, sjlabelled, webshot, sjPlot, ggplot2, corrplot, ltm)
 load("input/data/proc/alumnos_patterns.RData")
 load("input/data/proc/apoderados_patterns.RData")
 ```
@@ -50,9 +52,10 @@ data_apod <- apoderados_patterns %>% dplyr::select(idalumno,
 
 ## merge bases
 ```{r}
-data <- left_join(data_est, data_apod, by="idalumno")
+data <- merge(data_est, data_apod, by="idalumno")
 rm(apoderados_patterns, alumnos_patterns, data_est, data_apod)
 ```
+
 ```{r}
 # Educacion. 10 categorías, se recodifican en 4 y una de no sabe y no responde
 data$educacion_rec <- ifelse(is.na(data$educacion), "Ns/Nr", data$educacion)
@@ -153,27 +156,34 @@ dependientes$bienestar <- set_label(dependientes$bienestar,label = "Inequality j
 
 #dependientes$redistribucion <- factor(dependientes$redistribucion, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
 #dependientes$redistribucion <- set_label(dependientes$redistribucion,label = "The Chilean government should do something to reduce the income gap between the rich and the poor.")
+```
 
-df<- dfSummary(dependientes,
-               plain.ascii = FALSE,
-               style = "grid",
+
+```{r, results='asis'}
+df<-dfSummary(dependientes,
+               plain.ascii = TRUE,
+               style = "multiline",
                tmp.img.dir = "/tmp",
                graph.magnif = 0.75,
                headings = F,  # encabezado
                varnumbers = F, # num variable
                labels.col = T, # etiquetas
-               na.col = T,    # missing
-               graph.col = T, # plot
+               na.col = F,    # missing
+               graph.col = F, # plot
                valid.col = T, # n valido
-               col.widths = c(1000,10,10,10,10,10))
+               col.widths = c(30,10,10,10))
+
+
+
 df$Variable <- NULL # delete variable column
-view(df,file = "output/tables/desc01.html")
+df
+view(df, footnote=NA, file = "output/tables/desc01.html")
 webshot::webshot(url ="output/tables/desc01.html" ,file ="output/tables/desc01.png")
 ```
 
 # independientes
 ```{r}
-independientes <- data %>% dplyr::select(inteligencia_esc, esfuerzo_esc, esfuerzo_soc, merito_soc, inteligencia_soc, educacion_rec, libros_rec, acc_tec)
+independientes <- data %>% dplyr::select(inteligencia_esc, esfuerzo_esc, inteligencia_soc, esfuerzo_soc, merito_soc,  educacion_rec, libros_rec, acc_tec)
 
 independientes$inteligencia_esc <- factor(independientes$inteligencia_esc, levels = c("Muy desacuerdo", "Desacuerdo", "De acuerdo", "Muy de acuerdo"), labels = c("Strongly disagree", "Disagree", "Agree", "Strongly agree"))
 independientes$inteligencia_esc <- set_label(independientes$inteligencia_esc, label = "Intelligence is important to get good grades")
@@ -200,12 +210,13 @@ df2<- dfSummary(independientes,
                varnumbers = F, # num variable
                labels.col = T, # etiquetas
                na.col = F,    # missing
-               graph.col = T, # plot
+               graph.col = F, # plot
                valid.col = T, # n valido
-               col.widths = c(20,1000,10,10,10,10))
+               col.widths = c(20,30,10,10,10))
 
-df2$Variable <- c("School talent", "School effort", "Social effort", "Deservingness", "Social talent", "Education", "Books", "Technology")
-view(df2,file = "output/tables/desc02.html")
+df2$Variable <- c("School talent", "School effort", "Social talent", "Social effort", "Deservingness", "Education", "Books", "Technology")
+df2
+view(df2, footnote=NA, file = "output/tables/desc02.html")
 webshot(url ="output/tables/desc02.html" ,file ="output/tables/desc02.png")
 ```
 
@@ -229,13 +240,13 @@ df3<- dfSummary(school,
                varnumbers = F, # num variable
                labels.col = T, # etiquetas
                na.col = F,    # missing
-               graph.col = T, # plot
+               graph.col = F, # plot
                valid.col = T, # n valido
-               col.widths = c(10,1000,10,10,10,10))
+               col.widths = c(10,30,10,10,10))
 df3$Variable <- c("Prop. university level
 at school",
                   "Achievement", "Dependency", "Socioeconomic level")
-view(df3,file = "output/tables/desc03.html")
+view(df3, footnote=NA, file = "output/tables/desc03.html")
 webshot(url ="output/tables/desc03.html" ,file ="output/tables/desc03.png")
 ```
 
@@ -243,7 +254,7 @@ webshot(url ="output/tables/desc03.html" ,file ="output/tables/desc03.png")
 
 ## dependientes
 ```{r}
-dependientes <- sjPlot::plot_stackfrq(select(data, just_educ, just_pension, just_salud), geom.size = 0.4) +
+dependientes <- sjPlot::plot_stackfrq(dplyr::select(data, just_educ, just_pension, just_salud), geom.size = 0.4) +
   theme_bw() +
   theme(legend.position="bottom")
 dependientes
@@ -253,7 +264,7 @@ ggsave(dependientes, file = "output/graphs/dependientes.png",device = "png",widt
 ## independientes
 
 ```{r}
-independientes <- sjPlot::plot_stackfrq(select(data, inteligencia_esc, esfuerzo_esc, inteligencia_soc, merito_soc, esfuerzo_soc)) +
+independientes <- sjPlot::plot_stackfrq(dplyr::select(data, inteligencia_esc, esfuerzo_esc, inteligencia_soc, merito_soc, esfuerzo_soc)) +
   theme_bw() +
   theme(legend.position="bottom")
 

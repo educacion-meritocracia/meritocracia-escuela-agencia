@@ -53,7 +53,7 @@ data_apod <- data_apod %>%  set_na(internet, na = c(0,99), drop.levels = FALSE, 
 
 ## merge bases
 ```{r}
-data <- left_join(data_est, data_apod, by="idalumno")
+data <- merge(data_est, data_apod, by="idalumno")
 rm(apoderados_patterns, alumnos_patterns, data_est, data_apod)
 ```
 
@@ -147,16 +147,15 @@ save(data_rec, file = "input/data/proc/data_rec.RData")
 data_bienestar <- na.omit(data_rec)
 
 table(data_bienestar$just_pension)
-table(data_bienestar$pension_rec)
 
-corrplot.mixed(cor(dplyr::select(data_bienestar, educ_rec, salud_rec, pension_rec, redistribucion),
+corrplot.mixed(cor(dplyr::select(data_bienestar, just_pension, just_educ, just_salud, redistribucion),
                    method = "spearman",
                    use = "complete.obs"))
 ```
 
 ```{r}
 ltm::cronbach.alpha(data_bienestar  %>%
-  dplyr::select(educ_rec, salud_rec, pension_rec), na.rm=TRUE)
+  dplyr::select(just_educ, just_salud, just_pension), na.rm=TRUE)
 ```
 
 ```{r}
@@ -175,11 +174,11 @@ performance::icc(reg0_bienestar)
 ## Regresiones multinivel
 
 ```{r}
-reg1_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + (1 | mrbd), data=data_bienestar)
-reg2_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + (1 | mrbd), data=data_bienestar)
-reg3_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + internet_rec + (1 | mrbd), data=data_bienestar)
-reg4_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + internet_rec + mean_educ + cod_depe2 + cod_grupo + (1 | mrbd), data=data_bienestar)
-reg5_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + internet_rec + mean_educ + cod_depe2 + cod_grupo + simce + (1 | mrbd), data=data_bienestar)
+reg1_bienestar <- lmer(bienestar ~ 1 + inteligencia_esc + esfuerzo_esc + inteligencia_soc + esfuerzo_soc + merito_soc + (1 | mrbd), data=data_bienestar)
+reg2_bienestar <- lmer(bienestar ~ 1 + inteligencia_esc + esfuerzo_esc + inteligencia_soc + esfuerzo_soc + merito_soc + educacion_rec + libros_rec + acc_tec + internet_rec + (1 | mrbd), data=data_bienestar)
+
+reg3_bienestar <- lmer(bienestar ~ 1 + mean_educ + cod_depe2 + cod_grupo + simce + (1 | mrbd), data=data_bienestar)
+reg4_bienestar <- lmer(bienestar ~ 1 + esfuerzo_soc + merito_soc + inteligencia_soc + esfuerzo_esc + inteligencia_esc + educacion_rec + libros_rec + acc_tec + internet_rec + mean_educ + cod_depe2 + cod_grupo + simce + (1 | mrbd), data=data_bienestar)
 ```
 
 ### Test deviance
@@ -189,26 +188,23 @@ test01<- anova(reg0_bienestar,reg1_bienestar,test = "Chisq")
 test02<- anova(reg0_bienestar,reg2_bienestar,test = "Chisq")
 test03<- anova(reg0_bienestar,reg3_bienestar,test = "Chisq")
 test04<- anova(reg0_bienestar,reg4_bienestar,test = "Chisq")
-test05<- anova(reg0_bienestar,reg5_bienestar,test = "Chisq")
+
 
 test.pvalues1<- test01$`Pr(>Chisq)`[2]
 test.pvalues2<- test02$`Pr(>Chisq)`[2]
 test.pvalues3<- test03$`Pr(>Chisq)`[2]
 test.pvalues4<- test04$`Pr(>Chisq)`[2]
-test.pvalues5<- test05$`Pr(>Chisq)`[2]
 
 deviance1 <- test01$deviance[2]
 deviance2 <- test02$deviance[2]
 deviance3 <- test03$deviance[2]
 deviance4 <- test04$deviance[2]
-deviance5 <- test05$deviance[2]
-
 ```
 
 ### Tabla de regresión
 
 ```{r results='asis'}
-htmlreg(list(reg1_bienestar, reg2_bienestar, reg3_bienestar, reg4_bienestar, reg5_bienestar),
+htmlreg(list(reg1_bienestar, reg2_bienestar, reg3_bienestar, reg4_bienestar),
         custom.model.names = c("Modelo 1",
                                "Modelo 2",
                                "Modelo 3",
@@ -239,30 +235,52 @@ htmlreg(list(reg1_bienestar, reg2_bienestar, reg3_bienestar, reg4_bienestar, reg
                              )
 ```
 
+### Individual effects
+
 ```{r results='asis'}
 ## ojo aquí, creo que para los p*** sin exportar en html se puede usar "$^{***}$ p < 0.001; $^{**}$ p < 0.01; $^{*}$ p < 0.05
 
-htmlreg(list(reg1_bienestar, reg2_bienestar, reg3_bienestar, reg4_bienestar, reg5_bienestar),
+htmlreg(list(reg1_bienestar, reg2_bienestar),
         custom.model.names = c("Model 1",
-                               "Model 2",
-                               "Model 3",
-                               "Model 4",
-                               "Model 5"),
+                               "Model 2"),
         doctype = FALSE,
         custom.note = "*** p < 0.001; ** p < 0.01; * p < 0.05", 
         omit.coef = "(internet_rec)",
-        custom.coef.names = c("Intercept", 
-                              "Social effort",
-                              "Deservingness", 
-                              "Social talent", 
+        custom.coef.names = c("Intercept",  
+                              "School talent",
                               "School effort", 
-                              "School talent", 
+                              "Social talent",  
+                              "Social effort",
+                              "Deservingness",
                               "Secondary <br> <i>(Ref. 8th grade or less)</i>", 
                               "Higher tec.", 
                               "University or posgraduate", 
                               "Missing", 
                               "More than 25 books <br> <i>(Ref. Less than 25)</i>", 
-                              "Technology access",
+                              "Technology access"),
+        caption = "Justification of Inequality",
+        caption.above = TRUE,
+        custom.gof.rows=list("Deviance" = c(deviance1,
+                                            deviance2),
+                             "Deviance Test (p)" = c(test.pvalues1,
+                                                       test.pvalues2)),
+        file = "output/tables/reg_acceso_individual.html")
+
+webshot2::webshot(url ="output/tables/reg_acceso_individual.html" ,file ="output/tables/reg_acceso_individual.png")
+```
+
+### Contextual effects
+
+```{r results='asis'}
+## ojo aquí, creo que para los p*** sin exportar en html se puede usar "$^{***}$ p < 0.001; $^{**}$ p < 0.01; $^{*}$ p < 0.05
+
+htmlreg(list(reg3_bienestar, reg4_bienestar),
+        custom.model.names = c("Model 1",
+                               "Model 2"),
+        doctype = FALSE,
+        custom.note = "*** p < 0.001; ** p < 0.01; * p < 0.05", 
+        omit.coef = c("inteligencia_esc|esfuerzo_esc|inteligencia_soc|esfuerzo_soc|merito_soc|educacion_rec|libros_rec|acc_tec|internet_rec"),
+        custom.coef.names = c("Intercept", 
                               "Prop. university level at school",
                               "Subsidized private <br> <i>(Ref. Public)</i>", 
                               "Private", 
@@ -274,19 +292,13 @@ htmlreg(list(reg1_bienestar, reg2_bienestar, reg3_bienestar, reg4_bienestar, reg
                               "Simce High"),
         caption = "Justification of Inequality",
         caption.above = TRUE,
-        custom.gof.rows=list("Deviance" = c(deviance1,
-                                            deviance2,
-                                            deviance3,
-                                            deviance4,
-                                            deviance5),
-                             "Deviance Test (p)" = c(test.pvalues1,
-                                                       test.pvalues2,
-                                                       test.pvalues3,
-                                                       test.pvalues4,
-                                                       test.pvalues5)),
-        file = "output/tables/reg_acceso.html")
+        custom.gof.rows=list("Deviance" = c(deviance3,
+                                            deviance4),
+                             "Deviance Test (p)" = c(test.pvalues3,
+                                                     test.pvalues4)),
+        file = "output/tables/reg_acceso_contextual.html")
 
-webshot2::webshot(url ="output/tables/reg_acceso.html" ,file ="output/tables/reg_acceso.png")
+webshot2::webshot(url ="output/tables/reg_acceso_contextual.html" ,file ="output/tables/reg_acceso_contextual.png")
 ```
 
 ```{r}

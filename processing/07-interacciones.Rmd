@@ -523,11 +523,12 @@ collapse_rows <-
                       "Prop. university level",
                       "Simce Medium", 
                       "Simce High"),
+             school_intel,
+             school_effort,
+             soc_intel,  
              soc_effort, 
-             soc_merit, 
-             soc_intel, 
-             school_effort, 
-             school_intel) #espacio privado
+             soc_merit 
+             ) #espacio privado
 ```
 
 ### Estas interacciones de redistribucion no se incluirán en la tabla final
@@ -689,12 +690,12 @@ save(collapse_cols, file="input/data/proc/collapse_cols2.RData")
 ```{r}
 kbl(collapse_rows,
     align = "lccccc", booktabs = T,
-    col.names =  c("Variable",
+    col.names =  c("Variable", 
+                   "School talent", 
+                   "School effort",
+                   "Social talent",
                    "Social effort", 
-                   "Deservingness",
-                   "Social talent", 
-                   "School effort", 
-                   "School talent")) %>%
+                   "Deservingness")) %>%
   add_header_above(c(" " = 1,
                      "Justification of Inequality"=5), 
                    bold = T)%>%  
